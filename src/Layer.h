@@ -3,7 +3,7 @@
 
 class Layer{
 public:
-	Layer(int layerIndex, bool isSM1); //constructor
+	Layer(int layerIndex, bool isSM1/*, std::vector<int> v_hot*/); //constructor
 	virtual ~Layer()=default; // destructor 
 	inline void setLayerIndex(int layerIndex) { m_layerIndex = layerIndex;};
 	inline int getLayerIndex() { return m_layerIndex;};
@@ -23,13 +23,15 @@ public:
 	inline void setAlphaBeta(float alpha, float beta) { m_alpha = alpha; m_beta = beta;};
 	inline float getAlpha() {return m_alpha;};
 	inline float getBeta() {return m_beta;};
-	
+
+	//inline void addStripsToReject(std::vector<int> v_hot) { for(int hots:v_hot) m_v_strips_to_reject.push_back(hots);};
 	std::map<int, int> map_fired_strips_to_indices;
 
 private:
 	std::vector<int> m_v_hit_indices;
 	std::vector<int> m_v_fired_strips;
 
+	//std::vector<int> m_v_strips_to_reject;
 	bool m_isSM1 = false;
 	bool m_isTrigger = false;
 	int m_layerIndex;
@@ -37,7 +39,7 @@ private:
 	float m_beta;
 };
 
-inline Layer::Layer(int layerIndex, bool isSM1 )
+inline Layer::Layer(int layerIndex, bool isSM1 /*, std::vector<int> v_hot*/)
 {
 	setLayerIndex(layerIndex);
 	//addStripsToReject(v_hot);
@@ -67,9 +69,8 @@ inline float Layer::convertLayerToGlobalZ() // return center of drift gaps
 	return 0;
 }
 
-inline float Layer::convertStripToGlobalY_radius(int strip, int radius) // code for SM to be implemented
+inline float Layer::convertStripToGlobalY_radius(int strip, int radius) 
 {
-
 
 	if(radius==4) {
 	if(m_layerIndex==0) //eta layers
@@ -81,49 +82,38 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius) // code 
 	else if(m_layerIndex==1)
 	{
 		// SM1
-		return 895+35.3+(strip)*0.425; //strip+1 
+		return 895+35.3+(strip)*0.425; 
 	}
 	else if(m_layerIndex==2) //stereo layers
 	{
 		// SM1
-		return 895+35.3+(strip+1)*0.425; //strip-8
+		return 895+35.3+(strip)*0.425; 
 	}
 	else if(m_layerIndex==3) //stereo layers
 	{
-		// SM1
-	//	if(strip < 2552)
-	//		return 895+35.3+(strip+3)*0.425; //strip-8
-
-		if(strip >= 2560 && strip <=2663) return 895+35.3+(strip+1)*0.425; //strip-9
-		//else return 895+35.3+(strip+1)*0.425; //strip-8
-		else return 895+35.3+(strip)*0.425; //strip-9
+		return 895+35.3+(strip)*0.425;
 	}
 	} //end radius 4
 	else if(radius==5) {
 		if(m_layerIndex==0 ) //eta layers
 	{
 		// SM1
-		return 895+35.3+(strip-1)*0.425; 
+		return 895+35.3+(strip)*0.425; 
 	}
 	else if(m_layerIndex==1)
 	{
 		// SM1
-		return 895+35.3+(strip)*0.425; //strip+1 
+		return 895+35.3+(strip+1)*0.425; 
 	}
 
 	if(m_layerIndex==2 ) //stereo layers
 	{
-		// SM1
-	//	if(strip >= 2560 && strip <=2663) return 895+35.3+(strip)*0.425; //strip-9
-	//	else return 895+35.3+(strip)*0.425; //strip-9
-		return 895+35.3+(strip-1)*0.425; //strip-9
+		return 895+35.3+(strip-1)*0.425;
 	}
 	else if (m_layerIndex==3)
 	{
-		
-		if(strip >= 2560 && strip <=2663) return 895+35.3+(strip)*0.425; //strip-9
-		else return 895+35.3+(strip-1)*0.425; //strip-8
-		//else return 895+35.3+(strip-1)*0.425; //strip-9
+		if(strip >= 2560 && strip <=2663) return 895+35.3+(strip+1)*0.425;
+		return 895+35.3+(strip)*0.425;
 	}
 	
 	}//end radius 5
@@ -131,10 +121,8 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius) // code 
 
 }
 
-inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius) // code for SM to be implemented
+inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius)
 {
-
-
 	if(radius==4) {
 	if(m_layerIndex==0) //eta layers
 	{
@@ -144,42 +132,39 @@ inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius) // 
 	else if(m_layerIndex==1)
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); //strip+1 
+		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
 	else if(m_layerIndex==2) //stereo layers
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta ); //strip-8
+		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
 	else if(m_layerIndex==3) //stereo layers
 	{
-		// SM1
-		if(strip >= 2560 && strip <=2663) return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta); //strip-9
-		//else return 895+35.3+(strip+1)*0.425; //strip-8
-		else return (m_alpha + (895+35.3+(strip)*0.425)*m_beta );
+	    return (m_alpha + (895+35.3+(strip)*0.425)*m_beta );
 	}
 	} //end radius 4
 	else if(radius==5) {
 		if(m_layerIndex==0 ) //eta layers
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip-1)*0.425)*m_beta ); 
+		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
 	else if(m_layerIndex==1)
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); //strip+1 
+		return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta );
 	}
 
 	if(m_layerIndex==2 ) //stereo layers
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip-1)*0.425)*m_beta ); //strip-9
+		return (m_alpha + (895+35.3+(strip-1)*0.425)*m_beta ); 
 	}
 	else if (m_layerIndex==3)
 	{
-		if(strip >= 2560 && strip <=2663) return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); //strip-9
-		else return (m_alpha + (895+35.3+(strip-1)*0.425)*m_beta ); //strip-8
+		if(strip >= 2560 && strip <=2663) return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta);
+	    else return (m_alpha + (895+35.3+(strip)*0.425)*m_beta );
 	}
 	
 	}//end radius 5
@@ -189,11 +174,11 @@ inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius) // 
 
 inline float Layer::convertStripToGlobalY_corr(int strip) 
 {
-	
-if(!m_isSM1) {
-	if(strip<1536) return (m_alpha + (895+35.3+(std::abs(1535-strip)+1024)*0.45)*m_beta);
-	else return (m_alpha + (895+35.3+(strip)*0.45)*m_beta); 
-}
+
+	if(!m_isSM1) {
+		if(strip<1536) return (m_alpha + (895+35.3+(std::abs(1535-strip)+1024)*0.45)*m_beta);
+		else return (m_alpha + (895+35.3+(strip)*0.45)*m_beta); 
+	}
 	return 0;
 }
 
@@ -248,6 +233,7 @@ inline void Layer::bookFiredStrips(std::vector<int> *strips, std::vector<unsigne
 		//if(!m_isSM1 && m_layerIndex==0 && isDisconnectedStrip(strips->at(index))) continue;
 		if(pdo->at(index) > 64 )  // cut on PDO
 		{
+			//std::cout<<isDisconnectedStrip(strips->at(index))<<" "<<pdo->at(index)<<" "<<strips->at(index)<<" "<<m_layerIndex<<std::endl;
 			m_v_fired_strips.push_back(strips->at(index));
 			map_fired_strips_to_indices[strips->at(index)] = index;			
 		} //end if pdo

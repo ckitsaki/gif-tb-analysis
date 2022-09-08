@@ -30,6 +30,7 @@ public:
 	inline int getNStrips(int subcluster){return m_v_clusters[subcluster].size();};
 	inline void removeStrips_small(int subcluster);
 	inline float getZPosition() {return this_layer->convertLayerToGlobalZ();};
+
 	Layer* this_layer;
 	
 private:
@@ -101,6 +102,7 @@ inline void Cluster::removeStrips_small(int subcluster)
 {
 	int totCharge = getTotPdo(subcluster);
 	int single_strip_before = 0;
+
 	if( this_layer->getLayerIndex()==0 && totCharge<=280)
 	{
 		m_v_clusters[subcluster].clear();
@@ -134,11 +136,10 @@ inline float Cluster::getPosition(int subcluster)
 {
 	float sumpdo = 0; 
 	int totCharge = getTotPdo(subcluster);
-
 	for(int istrip = 0; istrip < m_v_clusters[subcluster].size(); istrip++){
 	if(m_v_radii[subcluster].at(istrip)==4 || m_v_radii[subcluster].at(istrip)==5) sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY_radius(m_v_clusters[subcluster].at(istrip), m_v_radii[subcluster].at(istrip));
 	else 
-	 sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY(m_v_clusters[subcluster].at(istrip));//, getStripRadius(subcluster,m_v_clusters[subcluster].at(istrip)));
+	 sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY(m_v_clusters[subcluster].at(istrip));
 
 	}
 	return sumpdo/totCharge;
@@ -231,5 +232,4 @@ inline void Cluster::fillClusters(std::vector<int> v_sorted_fired_strips)
 	}
 
 }
-
 #endif
