@@ -41,6 +41,12 @@ public:
 	TH1F* h_clus_positions[4];
 	TH1F* h_clus_positions_small[4];
 
+	TH1F* h_clus_positions_corr[4];
+	TH1F* h_clus_positions_small_corr[4];
+
+	TH1F* h_clus_positions_corr_ontrack[4];
+	TH1F* h_clus_positions_small_corr_ontrack[4];
+
 	TH1F* h_strip_time_in_clus[4];
 	TH1F* h_strip_time_in_clus_small[4];
 
@@ -338,23 +344,23 @@ inline void Histograms::init()
 	h_beamProfile_ontrack->GetYaxis()->SetTitle("#phi [mm]");
 	h_beamProfile_ontrack->GetXaxis()->SetTitle("#eta [mm]");
 
-	h_sby1_minus_eta_out_vs_pos_eta_out = new TH2F("h_sby1_minus_eta_out_vs_pos_eta_out", "SB1Y-IP1 vs IP1 position", 700, 1800, 2500, 700, -700, 0);
+	h_sby1_minus_eta_out_vs_pos_eta_out = new TH2F("h_sby1_minus_eta_out_vs_pos_eta_out", "SB1Y-IP1 vs IP1 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_eta_out_vs_pos_eta_out->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	h_sby1_minus_eta_out_vs_pos_eta_out->GetYaxis()->SetTitle("SB1Y-IP1 cluster position [mm]");
 
-	h_sby1_minus_pos_eta_in_vs_pos_eta_in = new TH2F("h_sby1_minus_pos_eta_in_vs_pos_eta_in", "SB1Y-IP2 vs IP2 position", 700, 1800, 2500, 700, -700, 0);
+	h_sby1_minus_pos_eta_in_vs_pos_eta_in = new TH2F("h_sby1_minus_pos_eta_in_vs_pos_eta_in", "SB1Y-IP2 vs IP2 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in->GetXaxis()->SetTitle("IP2 cluster position [mm]");
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in->GetYaxis()->SetTitle("SB1Y-IP2 cluster position [mm]");
 
-	h_sby1_minus_stereo_vs_stereo = new TH2F("h_sby1_minus_stereo_vs_stereo", "BS1Y-stereo vs SBY1 position", 700, 1300, 2000, 700, -700, 0);
+	h_sby1_minus_stereo_vs_stereo = new TH2F("h_sby1_minus_stereo_vs_stereo", "BS1Y-stereo vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_stereo_vs_stereo->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_vs_stereo->GetYaxis()->SetTitle("SB1Y-stereo cluster position [mm]");
 
-	h_sby1_minus_stereo_in_vs_stereo_in = new TH2F("h_sby1_minus_stereo_in_vs_stereo_in", "SB1Y-stereo_in vs SBY1 position", 700, 1300, 2000, 700, -700, 0);
+	h_sby1_minus_stereo_in_vs_stereo_in = new TH2F("h_sby1_minus_stereo_in_vs_stereo_in", "SB1Y-stereo_in vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_stereo_in_vs_stereo_in->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_in_vs_stereo_in->GetYaxis()->SetTitle("SBY1-stereo_in cluster position [mm]");
 
-	h_sby1_minus_stereo_out_vs_stereo_out = new TH2F("h_sby1_minus_stereo_out_vs_stereo_out", "SBY1-stereo_out vs SBY1 position", 700, 1300, 2000, 700, -700, 0);
+	h_sby1_minus_stereo_out_vs_stereo_out = new TH2F("h_sby1_minus_stereo_out_vs_stereo_out", "SBY1-stereo_out vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_stereo_out_vs_stereo_out->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_out_vs_stereo_out->GetYaxis()->SetTitle("SBY1-stereo_out cluster position [mm]");
 
@@ -515,6 +521,12 @@ inline void Histograms::init()
 		h_clus_positions[ilayer] = new TH1F(Form("h_clus_position_SM1_lay%i",ilayer), Form("SM1 Layer - %i", ilayer) ,7000, 0, 7000);
 		h_clus_positions_small[ilayer] = new TH1F(Form("h_clus_position_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer) ,7000, 0, 7000);
 		
+		h_clus_positions_corr[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,7000, 0, 7000);
+		h_clus_positions_small_corr[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,7000, 0, 7000);
+
+		h_clus_positions_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,7000, 0, 7000);
+		h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,7000, 0, 7000);
+
 		h_nclusters_per_layer_event[ilayer] = new TH1F(Form("h_nclusters_per_layer_event_%i",ilayer), Form("SM1 Layer - %i", ilayer) ,40, 0, 40);
 		
 		for(int istrip=0; istrip<8192; istrip++){

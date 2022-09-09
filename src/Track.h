@@ -279,6 +279,7 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isEtaOut=true;
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
+		  histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
 		  histograms->h_d_track_etaout_cut->Fill(distance_from_track);
 		  histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
 		  histograms->h_nstrips_on_track[layer]->Fill(cluster->getNStrips(index));
@@ -293,6 +294,7 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isEtaIn=true;
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
+		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
 		 	histograms->h_d_track_etain_cut->Fill(distance_from_track);
 		 	histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
 		 	histograms->h_nstrips_on_track[layer]->Fill(cluster->getNStrips(index));
@@ -308,6 +310,7 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		 m_isStereoIn=true;
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles))
 		 {
+		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
 		 	histograms->h_d_track_lay2_cut->Fill(distance_from_track);
 		 	histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
 		 	histograms->h_nstrips_on_track[layer]->Fill(cluster->getNStrips(index));
@@ -323,6 +326,7 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		 m_isStereoOut=true;
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) 
 		 {
+		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
 		 	histograms->h_d_track_lay3_cut->Fill(distance_from_track);
 		 	histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
 		 	histograms->h_nstrips_on_track[layer]->Fill(cluster->getNStrips(index));

@@ -1,6 +1,7 @@
 
 //#define TIME_CALIBRATION
 #include "TreeReader.C"
+
 #include "Track.h"
 
 int run(std::string run_number, std::string sector="C14")
@@ -436,7 +437,21 @@ int run(std::string run_number, std::string sector="C14")
 			histos->h_diffpos_stereolay0->Fill(pos_sby1-pos_l2, pos_sby1);
 		}
 
-// ==========================================   end aligment		
+		histos->h_clus_positions_small_corr[1]->Fill(cl_lay_small[1]->getCorrPosition(0));
+		// SBY2
+		for(int icl2=0; icl2<cl_lay_small[2]->getNClusters2(); icl2++) histos->h_clus_positions_small_corr[2]->Fill(cl_lay_small[2]->getCorrPosition(icl2));
+		// SBY3
+		for(int icl3=0; icl3<cl_lay_small[3]->getNClusters2(); icl3++) histos->h_clus_positions_small_corr[3]->Fill(cl_lay_small[3]->getCorrPosition(icl3));
+		// IP1
+		for(int icl_lay0=0; icl_lay0<cl_lay[0]->getNClusters2(); icl_lay0++) histos->h_clus_positions_corr[0]->Fill(cl_lay[0]->getCorrPosition(icl_lay0));
+		// IP2
+		for(int icl_lay1=0; icl_lay1<cl_lay[1]->getNClusters2(); icl_lay1++) histos->h_clus_positions_corr[1]->Fill(cl_lay[1]->getCorrPosition(icl_lay1));
+		// IP3
+		for(int icl_lay2=0; icl_lay2<cl_lay[2]->getNClusters2(); icl_lay2++) histos->h_clus_positions_corr[2]->Fill(cl_lay[2]->getCorrPosition(icl_lay2));
+		// IP4
+		for(int icl_lay3=0; icl_lay3<cl_lay[3]->getNClusters2(); icl_lay3++) histos->h_clus_positions_corr[3]->Fill(cl_lay[3]->getCorrPosition(icl_lay3));
+
+// ==========================================   end alignment		
 
 // Track selection
 		// accept all events which give at least 1 cluster on each of SBY2 and SBY3 small chambers 
@@ -539,6 +554,11 @@ int run(std::string run_number, std::string sector="C14")
 				}
 				
 				if(track->getTrack()->GetN()>3) track->setSM1errors(0);
+
+				histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack()->GetPointY(0)); // cluster position on SBY1
+				histos->h_clus_positions_small_corr_ontrack[2]->Fill(track->getTrack()->GetPointY(1)); // cluster position on SBY2
+				histos->h_clus_positions_small_corr_ontrack[3]->Fill(track->getTrack()->GetPointY(2)); // cluster position on SBY3
+				
 				if(count_layers_with_cluster==0) count_SM1_zero_hits++;
 				
 				if(track->acceptEtaOut()) count_SM1_eta_out++;
@@ -738,7 +758,11 @@ int run(std::string run_number, std::string sector="C14")
 					}
 					
 					if(track->getTrack(itrack)->GetN()>3) track->setSM1errors(itrack);
-					
+					if(track->checkIfSingleTrack()) {
+						histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack(itrack)->GetPointY(0)); // cluster position on SBY1
+						histos->h_clus_positions_small_corr_ontrack[2]->Fill(track->getTrack(itrack)->GetPointY(1)); // cluster position on SBY2
+						histos->h_clus_positions_small_corr_ontrack[3]->Fill(track->getTrack(itrack)->GetPointY(2)); // cluster position on SBY3
+					}
 					if(v_cand_tracks.size()>1) 
 					{
 						v_track_info_ypos.push_back(ypositions);
@@ -778,7 +802,7 @@ int run(std::string run_number, std::string sector="C14")
 			 				gr_mult_track->Write();
 			 			}
 			 			track->setCriterium();
-			 			track->refreshTrack(); // set layer flags back to false for the new track
+			 			track->refreshTrack(); 
 			 		}
 
 			 		for(int i=0; i<4; i++)
@@ -807,10 +831,10 @@ int run(std::string run_number, std::string sector="C14")
 
 				if(v_cand_tracks.size()>1) // select the optimal track among the many candidates
 				{
-					counter3++;
 					std::vector<float> v_good_track = track->getSelectionCriteria();
 					
 					if(!v_good_track.empty()) {
+					counter3++;
 					float min_elem = *min_element( v_good_track.begin(), v_good_track.end());
 					int index = find(v_good_track.begin(), v_good_track.end(), min_elem) - v_good_track.begin();
 
@@ -818,6 +842,10 @@ int run(std::string run_number, std::string sector="C14")
 					{
 						histos->h_nclusters_per_layer_event[iLayer]->Fill(cl_lay[iLayer]->getNClusters2());
 					}
+
+					histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack(index)->GetPointY(0)); // cluster position on SBY1
+					histos->h_clus_positions_small_corr_ontrack[2]->Fill(track->getTrack(index)->GetPointY(1)); // cluster position on SBY2
+					histos->h_clus_positions_small_corr_ontrack[3]->Fill(track->getTrack(index)->GetPointY(2)); // cluster position on SBY3
 
 					int count_layers_with_cluster_mult_track = v_track_info_layer[index].size();
 
@@ -839,6 +867,7 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_d_track_etaout->Fill(distance_from_track);
 							if(distance_from_track<=eta_out_cut_eff && distance_from_track>=-eta_out_cut_eff)
 							{
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_d_track_etaout_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
@@ -850,6 +879,7 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_d_track_etain->Fill(distance_from_track);
 							if(distance_from_track<=eta_in_cut_eff && distance_from_track>=-eta_in_cut_eff)
 							{
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_d_track_etain_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
@@ -861,6 +891,7 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_d_track_lay2->Fill(distance_from_track);
 							if(distance_from_track<=stereo_in_cut_eff && distance_from_track>=-stereo_in_cut_eff)
 							{
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_d_track_lay2_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
@@ -874,6 +905,7 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_d_track_ystereo->Fill(std::abs(distance_from_track));
 							if(distance_from_track<=stereo_out_cut_eff && distance_from_track>=-stereo_out_cut_eff)
 							{
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_d_track_lay3_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
@@ -972,7 +1004,6 @@ int run(std::string run_number, std::string sector="C14")
 
 	} // end event for-loop
 
-
 	out_file->cd();
 	out_file->mkdir("trigger");
 	out_file->mkdir("SM1/raw_hits");
@@ -1034,7 +1065,6 @@ int run(std::string run_number, std::string sector="C14")
 		histos->h_cl_charge_on_track[iLayer]->Write();
 	}
 
-	
 	out_file->cd("track_candidates/residuals");
 	histos->h_residuals_single_tracks->Write();
 	histos->h_residuals_mult_tracks->Write();
@@ -1059,13 +1089,16 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_mult_track_angle->Write();
 	histos->h_nlayers_mult_track_events->Write();
 	histos->h_prob_mult_tracks->Write();
-
 	histos->h_d_track_lay2->Write();
 	histos->h_d_track_lay3->Write();
 	histos->h_d_track_lay2_cut->Write();
 	histos->h_d_track_lay3_cut->Write();
 	histos->h_beamProfile_ontrack->Write();
-
+	for(int i=0; i<4; i++)
+	{
+		if(i>0) histos->h_clus_positions_small_corr_ontrack[i]->Write();
+		histos->h_clus_positions_corr_ontrack[i]->Write();
+	}
 
 	out_file->cd("alignment");
 	histos->h_res_SBY2_SBY3_vs_SBY2->Write(); 
@@ -1085,6 +1118,11 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_sby1_minus_stereo_in_vs_stereo_in->Write();
 	histos->h_sby1_minus_stereo_out_vs_stereo_out->Write();	
 	histos->h_beamProfile->Write();
+	for(int ilayer=0; ilayer<4; ilayer++)
+	{
+		if(ilayer>0) histos->h_clus_positions_small_corr[ilayer]->Write();
+		histos->h_clus_positions_corr[ilayer]->Write();
+	}
 
 	for(int iLayer=0; iLayer<4; iLayer++) 
 	{
@@ -1153,4 +1191,3 @@ int run(std::string run_number, std::string sector="C14")
 
 	return 0;
 }
-
