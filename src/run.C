@@ -480,13 +480,13 @@ int run(std::string run_number, std::string sector="C14")
 			//	std::cout<<"Event-"<<iEvent<<std::endl;
 			// study separately single and many track events
 			// single tracks
-			if(!track->tooMany() && !track->rejectTrack() && track->checkTrackCandidate())// && (track->getAngle()<=0.5 && track->getAngle()>=-0.5))
+			if(!track->tooMany() && !track->rejectTrack() && track->checkTrackCandidate())
 			{
 				counter3++; //single track counter
 				int count_layers_with_cluster = 0; // counts the number of layers with cluster on SM1	
 				count_events++;
 
-				if(track->getAngle()<=0.5 && track->getAngle()>=-0.5)
+				if(track->getAngle()<=track_angle_cut && track->getAngle()>=-track_angle_cut)
 				{
 					histos->h_angle_cut->Fill(track->getAngle());
 					counter5++;
@@ -510,7 +510,6 @@ int run(std::string run_number, std::string sector="C14")
 						float distance = std::abs(tr_slope*cl_lay[iLayer]->getZPosition() - cl_lay[iLayer]->getCorrPosition(icl) + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1));
 						v_dclus_to_track[iLayer].push_back(distance);
 					}
-
 				}
 				std::vector<int> v_index_lay2;
 				std::vector<int> v_index_lay3;
@@ -558,8 +557,8 @@ int run(std::string run_number, std::string sector="C14")
 					int ind_lay2 = v_index_lay2.at(index); // the cluster index on layer 2
 					int ind_lay3 = v_index_lay3.at(index); // the cluster index on layer 3
 					histos->h_d_track_ystereo->Fill(min_distance);
-					float pos_stereo_y = 0.56 + ((cl_lay[3]->getCorrPosition(ind_lay3)+cl_lay[2]->getCorrPosition(ind_lay2)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)); // if i add the 0.56 shift here the distribution is not centered at 0 for the yaxis
-					float pos_stereo_x = ((cl_lay[3]->getCorrPosition(ind_lay3)-cl_lay[2]->getCorrPosition(ind_lay2)) / 2*TMath::Sin(1.5*TMath::Pi()/180.)); // if i add the 0.56 shift here the distribution is not centered at 0 for the yaxis
+					float pos_stereo_y = 0.56 + ((cl_lay[3]->getCorrPosition(ind_lay3)+cl_lay[2]->getCorrPosition(ind_lay2)) / 2*TMath::Cos(1.5*TMath::Pi()/180.));
+					float pos_stereo_x = ((cl_lay[3]->getCorrPosition(ind_lay3)-cl_lay[2]->getCorrPosition(ind_lay2)) / 2*TMath::Sin(1.5*TMath::Pi()/180.));
 					histos->h_beamProfile_ontrack->Fill(pos_stereo_y, pos_stereo_x);
 					float pos_stereo_z = (cl_lay[3]->getZPosition() + cl_lay[2]->getZPosition() ) / 2;
 					track->checkDistanceFromTrack(0, 2, cl_lay[2], ind_lay2, stereo_in_cut_eff);
@@ -577,22 +576,22 @@ int run(std::string run_number, std::string sector="C14")
 				if(count_layers_with_cluster==0) count_SM1_zero_hits++;
 				
 				if(track->acceptEtaOut()) count_SM1_eta_out++;
-				if(track->acceptEtaOut() && (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_eta_out_angle++;
+				if(track->acceptEtaOut() && (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_eta_out_angle++;
 				if(track->acceptEtaIn()) count_SM1_eta_in++;
-				if(track->acceptEtaIn() && (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_eta_in_angle++;
+				if(track->acceptEtaIn() && (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_eta_in_angle++;
 				if(track->acceptStereo()) count_SM1_stereo++;
-				if(track->acceptStereo()&& (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_stereo_angle++;
+				if(track->acceptStereo()&& (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_stereo_angle++;
 				if(track->acceptStereoIn() && track->acceptStereoOut()) count_SM1_stereo_both++;
-				if(track->acceptStereoIn() && track->acceptStereoOut() && (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_stereo_both_angle++;
+				if(track->acceptStereoIn() && track->acceptStereoOut() && (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_stereo_both_angle++;
 				if(track->acceptStereoIn()) count_SM1_stereo_in++;
-				if(track->acceptStereoIn() && (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_stereo_in_angle++;
+				if(track->acceptStereoIn() && (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_stereo_in_angle++;
 				if(track->acceptStereoOut()) count_SM1_stereo_out++;
-				if(track->acceptStereoOut() && (track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) count_SM1_stereo_out_angle++;
+				if(track->acceptStereoOut() && (track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) count_SM1_stereo_out_angle++;
 				// fill cluster position difference
 				if(track->acceptEtaOut() && track->acceptEtaIn()) 
 				{
 					histos->h_pos_diff_eta_out_in->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
-					if((track->getAngle()>=-0.5 && track->getAngle()<=0.5 )) histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
+					if((track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut )) histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
 				}
 				
 				if(track->acceptEtaOut() && track->acceptStereo() )
@@ -600,7 +599,7 @@ int run(std::string run_number, std::string sector="C14")
 					if(track->acceptEtaIn()) histos->h_pos_diff_eta_out_stereo->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3));
 					else histos->h_pos_diff_eta_out_stereo->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
 
-					if((track->getAngle()>=-0.5 && track->getAngle()<=0.5 ))
+					if((track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut ))
 					{
 						if(track->acceptEtaIn()) histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3));
 						else histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
@@ -611,7 +610,7 @@ int run(std::string run_number, std::string sector="C14")
 					if(track->acceptEtaOut()) histos->h_pos_diff_eta_in_stereo->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
 					else histos->h_pos_diff_eta_in_stereo->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
 
-					if((track->getAngle()>=-0.5 && track->getAngle()<=0.5 ))
+					if((track->getAngle()>=-track_angle_cut && track->getAngle()<=track_angle_cut ))
 					{
 						if(track->acceptEtaOut()) histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
 						else histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
@@ -660,10 +659,6 @@ int run(std::string run_number, std::string sector="C14")
 				
 				for(int itrack=0; itrack<v_cand_tracks.size(); itrack++) // loop over tracks
 				{
-					//if( !(track->getAngle(itrack)>=-0.5 && track->getAngle(itrack)<=0.5)){
-					// counter4--;
-					// continue;
-					//	}
 					if(v_cand_tracks.size()>1)
 					{
 						count_mult_track_events++;
@@ -795,7 +790,7 @@ int run(std::string run_number, std::string sector="C14")
 							if(st_dist_from_track<=stereo_cut_eff && st_dist_from_track>=-stereo_cut_eff)
 							{
 								histos->h_d_track_stereo_cut->Fill(st_dist_from_track);
-								if(track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)
+								if(track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)
 									histos->h_d_track_stereo_cut_anglecut->Fill(st_dist_from_track);
 							}
 						}
@@ -833,24 +828,24 @@ int run(std::string run_number, std::string sector="C14")
 					if(count_layers_with_cluster==0 && track->checkIfSingleTrack()) count_SM1_zero_hits++;
 				
 					if(track->checkIfSingleTrack()) counter3++;
-					if(track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5))
+					if(track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut))
 					{
 						histos->h_angle_cut->Fill(track->getAngle(0));
 					 	counter5++;
 					} 	
 					
 					if(track->acceptEtaOut()&& track->checkIfSingleTrack()) count_SM1_eta_out++;
-					if(track->acceptEtaOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_eta_out_angle++;
+					if(track->acceptEtaOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_eta_out_angle++;
 					if(track->acceptEtaIn()&& track->checkIfSingleTrack()) count_SM1_eta_in++;
-					if(track->acceptEtaIn()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_eta_in_angle++;
+					if(track->acceptEtaIn()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_eta_in_angle++;
 					if(track->acceptStereo()&& track->checkIfSingleTrack()) count_SM1_stereo++;
-					if(track->acceptStereo()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_stereo_angle++;
+					if(track->acceptStereo()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_stereo_angle++;
 					if(track->acceptStereoIn() && track->acceptStereoOut()&& track->checkIfSingleTrack()) count_SM1_stereo_both++;
-					if(track->acceptStereoIn() && track->acceptStereoOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_stereo_both_angle++;
+					if(track->acceptStereoIn() && track->acceptStereoOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_stereo_both_angle++;
 					if(track->acceptStereoIn() && track->checkIfSingleTrack()) count_SM1_stereo_in++;
-					if(track->acceptStereoIn() && track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_stereo_in_angle++;
+					if(track->acceptStereoIn() && track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_stereo_in_angle++;
 					if(track->acceptStereoOut()&& track->checkIfSingleTrack()) count_SM1_stereo_out++;
-					if(track->acceptStereoOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)) count_SM1_stereo_out_angle++;
+					if(track->acceptStereoOut()&& track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)) count_SM1_stereo_out_angle++;
 
 					if(track->checkIfSingleTrack())
 					{
@@ -866,7 +861,7 @@ int run(std::string run_number, std::string sector="C14")
 							else histos->h_pos_diff_eta_in_stereo->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
 						}
 
-						if(track->getAngle(0)>=-0.5 && track->getAngle(0)<=0.5)
+						if(track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut)
 						{
 							if(track->acceptEtaOut() && track->acceptEtaIn()) histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
 							if(track->acceptEtaOut() && track->acceptStereo() )
@@ -936,7 +931,7 @@ int run(std::string run_number, std::string sector="C14")
 					float min_elem = *min_element( v_good_track.begin(), v_good_track.end());
 					int index = find(v_good_track.begin(), v_good_track.end(), min_elem) - v_good_track.begin();
 					float trangle = track->getAngle(index);
-					if(trangle>=-0.5 && trangle<=0.5)
+					if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 					{
 						histos->h_angle_cut->Fill(track->getAngle(index));
 						counter5++;
@@ -985,7 +980,7 @@ int run(std::string run_number, std::string sector="C14")
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
 								count_SM1_eta_out++;
-								if(trangle>=-0.5 && trangle<=0.5)
+								if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 								{
 									count_SM1_eta_out_angle++;
 									etaOut_angle=true;
@@ -1004,7 +999,7 @@ int run(std::string run_number, std::string sector="C14")
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
 								count_SM1_eta_in++;
-								if(trangle>=-0.5 && trangle<=0.5)
+								if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 								{
 									count_SM1_eta_in_angle++;
 									etaIn_angle=true;
@@ -1023,7 +1018,7 @@ int run(std::string run_number, std::string sector="C14")
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
 								count_SM1_stereo_in++;
-								if(trangle>=-0.5 && trangle<=0.5)
+								if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 								{
 									histos->h_d_track_lay2_cut_anglecut->Fill(distance_from_track);
 									count_SM1_stereo_in_angle++;
@@ -1043,7 +1038,7 @@ int run(std::string run_number, std::string sector="C14")
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
 								histos->h_nstrips_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getNStrips(v_track_info_cl_indices[index].at(i)));
 								count_SM1_stereo_out++;
-								if(trangle>=-0.5 && trangle<=0.5)
+								if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 								{
 									histos->h_d_track_lay3_cut_anglecut->Fill(distance_from_track);
 									count_SM1_stereo_out_angle++;
@@ -1064,7 +1059,7 @@ int run(std::string run_number, std::string sector="C14")
 								histos->h_d_track_stereo_cut->Fill(distance_from_track);
 								histos->h_beamProfile_ontrack->Fill(v_track_info_ypos[index].at(i), v_track_info_xpos[index].at(i));
 								count_SM1_stereo++;
-								if(trangle>=-0.5 && trangle<=0.5)
+								if(trangle>=-track_angle_cut && trangle<=track_angle_cut)
 								{
 									histos->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
 									count_SM1_stereo_angle++;
@@ -1371,7 +1366,7 @@ int run(std::string run_number, std::string sector="C14")
 	std::cout<<"stereo both (accepted) "<<count_SM1_stereo_both<<std::endl;
 	std::cout<<"ntracks with 0 hits on SM1 "<<count_SM1_zero_hits<<std::endl;
 	std::cout<<"<==========================> \n";
-	std::cout<<"Cut on track |angle|<=0.5 \n";
+	std::cout<<"Cut on track |angle|<= " <<track_angle_cut <<std::endl;
 	std::cout<<"N tracks "<<counter5<<std::endl;
 	std::cout<<"Eta out (accepted) "<<count_SM1_eta_out_angle<<std::endl;
 	std::cout<<"Eta in (accepted) "<<count_SM1_eta_in_angle<<std::endl;
