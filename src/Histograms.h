@@ -114,6 +114,7 @@ public:
 	TH2F* h_diffpos_stereolay1;
 
 	TH1F* h_angle;
+	TH1F* h_angle_cut;
 	TH1F* h_chi2ndf;
 	TH1F* h_chi2;
 	TH1F* h_prob;
@@ -164,10 +165,24 @@ public:
 	TH1F* h_d_track_lay3;
 	TH1F* h_d_track_lay3_cut;
 
+	TH1F* h_d_track_etaout_cut_anglecut;
+	TH1F* h_d_track_etain_cut_anglecut;
+	TH1F* h_d_track_lay2_cut_anglecut;
+	TH1F* h_d_track_lay3_cut_anglecut;
+	TH1F* h_d_track_stereo_cut_anglecut;
+
 	TH2F* h_res_SBY2_SBY1_vs_SBY1;
 	TH2F* h_res_SBY3_SBY1_vs_SBY1;
 	TH2F* h_pos_etain_vs_pos_etaout;
 	TH2F* h_real_vs_exp_position_etaout;
+
+	TH1F* h_pos_diff_eta_out_in;
+	TH1F* h_pos_diff_eta_out_stereo;
+	TH1F* h_pos_diff_eta_in_stereo;
+
+	TH1F* h_pos_diff_eta_out_in_cutangle;
+	TH1F* h_pos_diff_eta_out_stereo_cutangle;
+	TH1F* h_pos_diff_eta_in_stereo_cutangle;
 
 	Histograms();
 	inline void init();
@@ -187,11 +202,32 @@ inline void Histograms::init()
 	h_real_vs_exp_position_etaout->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	h_real_vs_exp_position_etaout->GetYaxis()->SetTitle("expected position [mm]");
 
+	h_pos_diff_eta_out_in = new TH1F("h_pos_diff_eta_out_in", "eta_in - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_in->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	
+	h_pos_diff_eta_out_stereo = new TH1F("h_pos_diff_eta_out_stereo", "stereo - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_stereo->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	
+	h_pos_diff_eta_in_stereo = new TH1F("h_pos_diff_eta_in_stereo", "stereo - eta_in" ,1000, -10, 10);
+	h_pos_diff_eta_in_stereo->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+
+	h_pos_diff_eta_out_in_cutangle = new TH1F("h_pos_diff_eta_out_in_cutangle", "eta_in - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_in_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	
+	h_pos_diff_eta_out_stereo_cutangle = new TH1F("h_pos_diff_eta_out_stereo_cutangle", "stereo - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	
+	h_pos_diff_eta_in_stereo_cutangle = new TH1F("h_pos_diff_eta_in_stereo_cutangle", "stereo - eta_in" ,1000, -10, 10);
+	h_pos_diff_eta_in_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+
 	h_d_track_etaout = new TH1F("h_d_track_etaout", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_etaout_cut = new TH1F("h_d_track_etaout_cut", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout_cut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etaout_cut_anglecut = new TH1F("h_d_track_etaout_cut_anglecut", "Distance from track - eta_out" ,1000, -10, 10);
+	h_d_track_etaout_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_etain = new TH1F("h_d_track_etain", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain->GetXaxis()->SetTitle("distance [mm]");
@@ -199,11 +235,17 @@ inline void Histograms::init()
 	h_d_track_etain_cut = new TH1F("h_d_track_etain_cut", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain_cut->GetXaxis()->SetTitle("distance [mm]");
 
+	h_d_track_etain_cut_anglecut = new TH1F("h_d_track_etain_cut_anglecut", "Distance from track - eta_in" ,1000, -10, 10);
+	h_d_track_etain_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
 	h_d_track_stereo = new TH1F("h_d_track_stereo", "Distance from track - stereo" ,1000, -10, 10);
 	h_d_track_stereo->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_stereo_cut = new TH1F("h_d_track_stereo_cut", "Distance from track - stereo" ,1000, -10, 10);
 	h_d_track_stereo_cut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_stereo_cut_anglecut = new TH1F("h_d_track_stereo_cut_anglecut", "Distance from track - stereo" ,1000, -10, 10);
+	h_d_track_stereo_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_lay2 = new TH1F("h_d_track_lay2", "Distance from track - stereo_in" ,1000, -10, 10);
 	h_d_track_lay2->GetXaxis()->SetTitle("distance [mm]");
@@ -211,11 +253,17 @@ inline void Histograms::init()
 	h_d_track_lay2_cut = new TH1F("h_d_track_lay2_cut", "Distance from track - stereo_in" ,1000, -10, 10);
 	h_d_track_lay2_cut->GetXaxis()->SetTitle("distance [mm]");
 
+	h_d_track_lay2_cut_anglecut = new TH1F("h_d_track_lay2_cut_anglecut", "Distance from track - stereo_in" ,1000, -10, 10);
+	h_d_track_lay2_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
 	h_d_track_lay3 = new TH1F("h_d_track_lay3", "Distance from track - stereo_out" ,1000, -10, 10);
 	h_d_track_lay3->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_lay3_cut = new TH1F("h_d_track_lay3_cut", "Distance from track - stereo_out" ,1000, -10, 10);
 	h_d_track_lay3_cut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_lay3_cut_anglecut = new TH1F("h_d_track_lay3_cut_anglecut", "Distance from track - stereo_out" ,1000, -10, 10);
+	h_d_track_lay3_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_ystereo = new TH1F("h_d_track_ystereo", "Distance from track - stereo_y" ,1000, -10, 10);
 	h_d_track_ystereo->GetXaxis()->SetTitle("distance [mm]");
@@ -258,6 +306,9 @@ inline void Histograms::init()
 
 	h_angle = new TH1F("h_angle", "track angle", 5000, -50, 50);
 	h_angle->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_angle_cut = new TH1F("h_angle_cut", "track angle", 5000, -50, 50);
+	h_angle_cut->GetXaxis()->SetTitle("#theta [deg]");
 
 	h_mult_track_angle = new TH1F("h_mult_track_angle", "track angle (>1 tracks)", 5000, -50, 50);
 	h_mult_track_angle->GetXaxis()->SetTitle("#theta [deg]");
@@ -521,11 +572,11 @@ inline void Histograms::init()
 		h_clus_positions[ilayer] = new TH1F(Form("h_clus_position_SM1_lay%i",ilayer), Form("SM1 Layer - %i", ilayer) ,7000, 0, 7000);
 		h_clus_positions_small[ilayer] = new TH1F(Form("h_clus_position_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer) ,7000, 0, 7000);
 		
-		h_clus_positions_corr[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,7000, 0, 7000);
-		h_clus_positions_small_corr[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,7000, 0, 7000);
+		h_clus_positions_corr[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,700, 1300, 2000);
+		h_clus_positions_small_corr[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
 
-		h_clus_positions_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,7000, 0, 7000);
-		h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,7000, 0, 7000);
+		h_clus_positions_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,700, 1300, 2000);
+		h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
 
 		h_nclusters_per_layer_event[ilayer] = new TH1F(Form("h_nclusters_per_layer_event_%i",ilayer), Form("SM1 Layer - %i", ilayer) ,40, 0, 40);
 		
