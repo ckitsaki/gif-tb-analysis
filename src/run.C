@@ -52,6 +52,8 @@ int run(std::string run_number, std::string sector="C14")
 	out_file->mkdir("track_candidates/residuals");
 	out_file->mkdir("track_candidates/anglecut");
 	out_file->mkdir("track_candidates/SM1");
+	out_file->mkdir("track_candidates/inclusive/IP1-4points/track_displays");
+	out_file->mkdir("track_candidates/inclusive/IP2-4points/track_displays");
 	
 	gROOT->cd();
 
@@ -534,7 +536,12 @@ int run(std::string run_number, std::string sector="C14")
 
 				for(int iLayer=0; iLayer<4; iLayer++) // fill the track graph with SM1 eta layers 
 				{
-					if(v_dclus_to_track[iLayer].empty()) continue;
+					if(v_dclus_to_track[iLayer].empty()) 
+					{
+						if(iLayer==0) track->etaOut_fired();
+						if(iLayer==1) track->etaIn_fired();
+						continue;
+					} 
 					float min_distance = *min_element(v_dclus_to_track[iLayer].begin(), v_dclus_to_track[iLayer].end());
 					int index = find(v_dclus_to_track[iLayer].begin(), v_dclus_to_track[iLayer].end(),min_distance) - v_dclus_to_track[iLayer].begin(); // index of the cluster which belongs to the track
 					if(iLayer<2) track->fillSM1events(index, cl_lay[iLayer], iLayer, 0);	// eta layers
@@ -568,7 +575,19 @@ int run(std::string run_number, std::string sector="C14")
 				}
 				
 				if(track->getTrack()->GetN()>3) track->setSM1errors(0);
-
+				TGraphAsymmErrors* gr_track_4points_IP1;
+				TGraphAsymmErrors* gr_track_4points_IP2;
+				if(track->etaOut_fired(0))
+				{
+					gr_track_4points_IP1 = track->track4points(0,0);
+					gr_track_4points_IP1->SetName(Form("gr_track_4points_IP1_%i",iEvent));
+				}
+				if(track->etaIn_fired(0))
+				{
+					gr_track_4points_IP2 = track->track4points(0,1);
+					gr_track_4points_IP2->SetName(Form("gr_track_4points_IP2_%i",iEvent));
+				}
+				
 				histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack()->GetPointY(0)); // cluster position on SBY1
 				histos->h_clus_positions_small_corr_ontrack[2]->Fill(track->getTrack()->GetPointY(1)); // cluster position on SBY2
 				histos->h_clus_positions_small_corr_ontrack[3]->Fill(track->getTrack()->GetPointY(2)); // cluster position on SBY3
@@ -623,6 +642,20 @@ int run(std::string run_number, std::string sector="C14")
 					gr_track->SetTitle(Form("Event-%i",iEvent));
 					gr_track->Write();
 				}
+
+				if(track->etaOut_fired(0) && count_events < 101 && count_layers_with_cluster>0)
+				{
+					out_file->cd("track_candidates/inclusive/IP1-4points/track_displays");
+					gr_track_4points_IP1->SetTitle(Form("Event-%i",iEvent));
+					gr_track_4points_IP1->Write();
+				}
+
+				if(track->etaIn_fired(0) && count_events < 101 && count_layers_with_cluster>0)
+				{
+					out_file->cd("track_candidates/inclusive/IP2-4points/track_displays");
+					gr_track_4points_IP2->SetTitle(Form("Event-%i",iEvent));
+					gr_track_4points_IP2->Write();
+				}
 				for(int i=0; i<4; i++)
 				{
 					v_dclus_to_track[i].clear();
@@ -638,7 +671,6 @@ int run(std::string run_number, std::string sector="C14")
 				histos->h_nlayers_with_cluster->Fill(count_layers_with_cluster);
 				histos->h_singletrack_events->Fill(1);
 			}
-
 			
 			if(track->tooMany() && !track->getCandidateTracks().empty())
 			{
@@ -723,7 +755,12 @@ int run(std::string run_number, std::string sector="C14")
 					}
 					for(int iLayer=0; iLayer<4; iLayer++) // eta layers
 					{
-						if(v_dclus_to_track[iLayer].empty()) continue;
+						if(v_dclus_to_track[iLayer].empty()) 
+						{
+							if(iLayer==0) track->etaOut_fired();
+							if(iLayer==1) track->etaIn_fired();
+							continue;
+						}
 						float min_distance = *min_element(v_dclus_to_track[iLayer].begin(), v_dclus_to_track[iLayer].end());
 						int index = find(v_dclus_to_track[iLayer].begin(), v_dclus_to_track[iLayer].end(),min_distance) - v_dclus_to_track[iLayer].begin(); // index of the cluster which belongs to the track
 						if(iLayer<2) {
@@ -827,7 +864,33 @@ int run(std::string run_number, std::string sector="C14")
 
 					if(count_layers_with_cluster==0 && track->checkIfSingleTrack()) count_SM1_zero_hits++;
 				
-					if(track->checkIfSingleTrack()) counter3++;
+					if(track->checkIfSingleTrack()) {
+						TGraphAsymmErrors* gr_track_4points_IP1;
+						TGraphAsymmErrors* gr_track_4points_IP2;
+						if(track->etaOut_fired(0))
+						{
+							gr_track_4points_IP1 = track->track4points(0,0);
+							gr_track_4points_IP1->SetName(Form("gr_track_4points_IP1_0_%i",iEvent));
+							if(count_events < 101)
+							{
+								out_file->cd("track_candidates/inclusive/IP1-4points/track_displays");
+								gr_track_4points_IP1->SetTitle(Form("Event-%i",iEvent));
+								gr_track_4points_IP1->Write();
+							}
+						}
+						if(track->etaIn_fired(0))
+						{
+							gr_track_4points_IP2 = track->track4points(0,1);
+							gr_track_4points_IP2->SetName(Form("gr_track_4points_IP2_0_%i",iEvent));
+							if(count_events < 101)
+							{
+								out_file->cd("track_candidates/inclusive/IP2-4points/track_displays");
+								gr_track_4points_IP2->SetTitle(Form("Event-%i",iEvent));
+								gr_track_4points_IP2->Write();
+							}
+						}
+						counter3++;
+					} 
 					if(track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut && track->getAngle(0)<=track_angle_cut))
 					{
 						histos->h_angle_cut->Fill(track->getAngle(0));
@@ -939,6 +1002,33 @@ int run(std::string run_number, std::string sector="C14")
 					for(int iLayer=0; iLayer<4; iLayer++)
 					{
 						histos->h_nclusters_per_layer_event[iLayer]->Fill(cl_lay[iLayer]->getNClusters2());
+					}
+
+					TGraphAsymmErrors* gr_track_4points_IP1;
+					TGraphAsymmErrors* gr_track_4points_IP2;
+					
+					if(track->etaOut_fired(index))
+					{
+						gr_track_4points_IP1 = track->track4points(index,0);
+						gr_track_4points_IP1->SetName(Form("gr_track_4points_IP1_%i_%i",index,iEvent));
+						if(count_mult_track_events<101)
+						{
+							out_file->cd("track_candidates/inclusive/IP1-4points/track_displays");
+							gr_track_4points_IP1->SetTitle(Form("Event-%i",iEvent));
+							gr_track_4points_IP1->Write();
+						}	
+					}
+
+					if(track->etaIn_fired(index))
+					{
+						gr_track_4points_IP2 = track->track4points(index,1);
+						gr_track_4points_IP2->SetName(Form("gr_track_4points_IP2_%i_%i",index,iEvent));
+						if(count_mult_track_events<101)
+						{
+							out_file->cd("track_candidates/inclusive/IP2-4points/track_displays");
+							gr_track_4points_IP2->SetTitle(Form("Event-%i",iEvent));
+							gr_track_4points_IP2->Write();
+						}	
 					}
 
 					histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack(index)->GetPointY(0)); // cluster position on SBY1
@@ -1192,7 +1282,8 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_cutflow->GetXaxis()->SetBinLabel(2, "1 clus SBY1");
 	histos->h_cutflow->GetXaxis()->SetBinLabel(3, "N candidate tracks");
 	histos->h_cutflow->GetXaxis()->SetBinLabel(4, "N reference tracks");
-	histos->h_cutflow->GetXaxis()->SetBinLabel(5, "|angle|<=0.5");
+	std::string cutangletitle = "|angle|<=" + to_string(track_angle_cut) + "deg";
+	histos->h_cutflow->GetXaxis()->SetBinLabel(5, cutangletitle.c_str());
 
 
 	for(int iLayer=0; iLayer<4; iLayer++) 
@@ -1248,6 +1339,24 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_d_track_lay2_cut_anglecut->Write();
 	histos->h_d_track_lay3_cut_anglecut->Write();
 	histos->h_d_track_stereo_cut_anglecut->Write();
+
+	out_file->cd("track_candidates/inclusive/IP1-4points");
+	histos->h_chi2ndf_4points_IP1->Write();
+	histos->h_chi2_4points_IP1->Write();
+	histos->h_angle_4points_IP1->Write();
+	histos->h_prob_4points_IP1->Write();
+	histos->h_d_track_etaout_4points->Write();
+	histos->h_d_track_etaout_cut_4points->Write();
+	histos->h_d_track_etaout_cut_anglecut_4points->Write();
+
+	out_file->cd("track_candidates/inclusive/IP2-4points");
+	histos->h_chi2ndf_4points_IP2->Write();
+	histos->h_chi2_4points_IP2->Write();
+	histos->h_angle_4points_IP2->Write();
+	histos->h_prob_4points_IP2->Write();
+	histos->h_d_track_etain_4points->Write();
+	histos->h_d_track_etain_cut_4points->Write();
+	histos->h_d_track_etain_cut_anglecut_4points->Write();
 
 	out_file->cd("track_candidates");
 	histos->h_angle_only_scluster_sby2->Write();

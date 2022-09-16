@@ -123,6 +123,16 @@ public:
 	TH1F* h_angle_only_scluster_sby3;
 	TH1F* h_dangle_only_scluster_sby2sby3;
 
+	TH1F* h_angle_4points_IP1;
+	TH1F* h_chi2ndf_4points_IP1;
+	TH1F* h_chi2_4points_IP1;
+	TH1F* h_prob_4points_IP1;
+
+	TH1F* h_angle_4points_IP2;
+	TH1F* h_chi2ndf_4points_IP2;
+	TH1F* h_chi2_4points_IP2;
+	TH1F* h_prob_4points_IP2;
+
 	TH2F* h_sby1_minus_eta_out_vs_pos_eta_out;
 	TH2F* h_sby1_minus_pos_eta_in_vs_pos_eta_in;
 	TH2F* h_sby1_minus_stereo_vs_stereo;
@@ -170,6 +180,14 @@ public:
 	TH1F* h_d_track_lay2_cut_anglecut;
 	TH1F* h_d_track_lay3_cut_anglecut;
 	TH1F* h_d_track_stereo_cut_anglecut;
+
+	TH1F* h_d_track_etaout_4points;
+	TH1F* h_d_track_etaout_cut_4points;
+	TH1F* h_d_track_etaout_cut_anglecut_4points;
+
+	TH1F* h_d_track_etain_4points;
+	TH1F* h_d_track_etain_cut_4points;
+	TH1F* h_d_track_etain_cut_anglecut_4points;
 
 	TH2F* h_res_SBY2_SBY1_vs_SBY1;
 	TH2F* h_res_SBY3_SBY1_vs_SBY1;
@@ -228,6 +246,24 @@ inline void Histograms::init()
 
 	h_d_track_etaout_cut_anglecut = new TH1F("h_d_track_etaout_cut_anglecut", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etaout_4points = new TH1F("h_d_track_etaout_4points", "Distance from track - eta_out" ,10000, -10, 10);
+	h_d_track_etaout_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etaout_cut_4points = new TH1F("h_d_track_etaout_cut_4points", "Distance from track - eta_out" ,10000, -10, 10);
+	h_d_track_etaout_cut_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etaout_cut_anglecut_4points = new TH1F("h_d_track_etaout_cut_anglecut_4points", "Distance from track - eta_out" ,10000, -10, 10);
+	h_d_track_etaout_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etain_4points = new TH1F("h_d_track_etain_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etain_cut_4points = new TH1F("h_d_track_etain_cut_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_cut_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etain_cut_anglecut_4points = new TH1F("h_d_track_etain_cut_anglecut_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_etain = new TH1F("h_d_track_etain", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain->GetXaxis()->SetTitle("distance [mm]");
@@ -307,6 +343,12 @@ inline void Histograms::init()
 	h_angle = new TH1F("h_angle", "track angle", 5000, -50, 50);
 	h_angle->GetXaxis()->SetTitle("#theta [deg]");
 
+	h_angle_4points_IP1 = new TH1F("h_angle_4points_IP1", "track angle", 5000, -50, 50);
+	h_angle_4points_IP1->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_angle_4points_IP2 = new TH1F("h_angle_4points_IP2", "track angle", 5000, -50, 50);
+	h_angle_4points_IP2->GetXaxis()->SetTitle("#theta [deg]");
+
 	h_angle_cut = new TH1F("h_angle_cut", "track angle", 5000, -50, 50);
 	h_angle_cut->GetXaxis()->SetTitle("#theta [deg]");
 
@@ -324,6 +366,15 @@ inline void Histograms::init()
 	h_chi2ndf = new TH1F("h_chi2ndf", "chi2 / ndf", 150, 0, 15);
 	h_chi2 = new TH1F("h_chi2", "chi2", 100, 0, 100);
 	h_prob = new TH1F("h_prob", "h_prob", 100, 0, 1);
+
+	h_chi2ndf_4points_IP1 = new TH1F("h_chi2ndf_4points_IP1", "chi2 / ndf", 150, 0, 15);
+	h_chi2_4points_IP1 = new TH1F("h_chi2_4points_IP1", "chi2", 100, 0, 100);
+	h_prob_4points_IP1 = new TH1F("h_prob_4points_IP1", "h_prob", 100, 0, 1);
+
+	h_chi2ndf_4points_IP2 = new TH1F("h_chi2ndf_4points_IP2", "chi2 / ndf", 150, 0, 15);
+	h_chi2_4points_IP2 = new TH1F("h_chi2_4points_IP2", "chi2", 100, 0, 100);
+	h_prob_4points_IP2 = new TH1F("h_prob_4points_IP2", "h_prob", 100, 0, 1);
+
 	h_prob_mult_tracks = new TH1F("h_prob_mult_tracks", "h_prob_mult_tracks", 100, 0, 1);
 
 	h_strip_index_vs_pdo0_trigger = new TH2F("h_strip_index_vs_pdo_trigger", "trigger", 8192, 0, 8192, 1024, 0, 1024);

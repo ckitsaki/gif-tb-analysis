@@ -75,13 +75,23 @@ public:
 	inline void isSingleTrack() {m_mult_track_singles = true;};
 	inline bool checkIfSingleTrack() {return m_mult_track_singles;};
 
+	// Methods to calculate the efficiency using the inclusive-exclusive method
+	inline TGraphAsymmErrors* track4points(int itrack, int ilayer); 
+	inline bool etaOut_fired(int itrack) {return m_etaOut_fired.at(itrack);};
+	inline bool etaIn_fired(int itrack) {return m_etaIn_fired.at(itrack);};
+	inline void etaOut_fired() {m_etaOut_fired.push_back(false);};
+	inline void etaIn_fired() {m_etaIn_fired.push_back(false);};
+
 	TGraphAsymmErrors* gr_track;
+	TGraphAsymmErrors* gr_track_4points;
+	TGraphAsymmErrors* gr_track_5points;
 	Histograms* histograms;
 
 private:
 	Cluster* m_cl_sby1;
 	Cluster* m_cl_sby2;
 	Cluster* m_cl_sby3;
+	
 	int m_counter_1deg=0;
 	int m_counter_outside1deg_theonly_scluster=0;
 	int m_counter_more_clusters=0;
@@ -102,6 +112,11 @@ private:
 	bool m_isStereoIn = false;
 	bool m_isStereoOut = false;
 	bool m_mult_track_singles = false;
+
+// flags for inclusive-exclusive method
+	std::vector<bool> m_etaOut_fired; 
+	std::vector<bool> m_etaIn_fired; 
+// =====================================
 
 	bool m_accept_eta_out = false;
 	bool m_accept_eta_in = false;
@@ -206,9 +221,141 @@ inline void Track::fillSM1events(int clus_index, Cluster* clus_lay, int layIndex
 	m_map_point_charge[m_ipoint] = clus_lay->getTotPdo(clus_index);
 	m_totCharge += clus_lay->getTotPdo(clus_index);
 //	std::cout<<"POINTS: "<<gr_track->GetPointX(m_ipoint)<<" "<<gr_track->GetPointY(m_ipoint)<<std::endl;
-	if(layIndex==0) checkDistanceFromTrack(itrack, layIndex, clus_lay, clus_index, eta_out_cut_eff);
-	if(layIndex==1) checkDistanceFromTrack(itrack, layIndex, clus_lay, clus_index, eta_in_cut_eff);
+	if(layIndex==0)
+	{
+		checkDistanceFromTrack(itrack, layIndex, clus_lay, clus_index, eta_out_cut_eff);
+		m_etaOut_fired.push_back(true);
+	} 
+	if(layIndex==1)
+	{
+		checkDistanceFromTrack(itrack, layIndex, clus_lay, clus_index, eta_in_cut_eff);
+		m_etaIn_fired.push_back(true);
+	} 
 }
+
+inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
+{
+	gr_track_4points = new TGraphAsymmErrors();
+	gr_track_4points->GetXaxis()->SetTitle("z [mm]");
+	gr_track_4points->GetYaxis()->SetTitle("y [mm]");
+	bool check = false;
+	if(ilayer>0) check=true; 
+	
+	if(!m_many_sclusters)
+	{
+		gr_track_4points->SetPointX(0, gr_track->GetPointX(0));
+		gr_track_4points->SetPointX(1, gr_track->GetPointX(1));
+		gr_track_4points->SetPointX(2, gr_track->GetPointX(2));
+
+		gr_track_4points->SetPointY(0, gr_track->GetPointY(0));
+		gr_track_4points->SetPointY(1, gr_track->GetPointY(1));
+		gr_track_4points->SetPointY(2, gr_track->GetPointY(2));
+
+		gr_track_4points->SetPointError(0, gr_track->GetErrorXlow(0), gr_track->GetErrorXhigh(0), gr_track->GetErrorYlow(0), gr_track->GetErrorYhigh(0));
+		gr_track_4points->SetPointError(1, gr_track->GetErrorXlow(1), gr_track->GetErrorXhigh(1), gr_track->GetErrorYlow(1), gr_track->GetErrorYhigh(1));
+		gr_track_4points->SetPointError(2, gr_track->GetErrorXlow(2), gr_track->GetErrorXhigh(2), gr_track->GetErrorYlow(2), gr_track->GetErrorYhigh(2));
+
+		if(gr_track->GetN()>3 )
+		{
+			if(check && m_etaOut_fired.at(itrack))
+			{
+				gr_track_4points->SetPointX(3, gr_track->GetPointX(4));
+				gr_track_4points->SetPointY(3, gr_track->GetPointY(4));
+				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(4), gr_track->GetErrorXhigh(4), gr_track->GetErrorYlow(4), gr_track->GetErrorYhigh(4));
+			}
+			else
+			{
+				gr_track_4points->SetPointX(3, gr_track->GetPointX(3));
+				gr_track_4points->SetPointY(3, gr_track->GetPointY(3));
+				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(3), gr_track->GetErrorXhigh(3), gr_track->GetErrorYlow(3), gr_track->GetErrorYhigh(3));
+			}
+		}
+	}
+	else
+	{
+		gr_track_4points->SetPointX(0, getTrack(itrack)->GetPointX(0));
+		gr_track_4points->SetPointX(1, getTrack(itrack)->GetPointX(1));
+		gr_track_4points->SetPointX(2, getTrack(itrack)->GetPointX(2));
+		
+		gr_track_4points->SetPointError(0, getTrack(itrack)->GetErrorXlow(0), getTrack(itrack)->GetErrorXhigh(0), getTrack(itrack)->GetErrorYlow(0), getTrack(itrack)->GetErrorYhigh(0));
+		gr_track_4points->SetPointError(1, getTrack(itrack)->GetErrorXlow(1), getTrack(itrack)->GetErrorXhigh(1), getTrack(itrack)->GetErrorYlow(1), getTrack(itrack)->GetErrorYhigh(1));
+		gr_track_4points->SetPointError(2, getTrack(itrack)->GetErrorXlow(2), getTrack(itrack)->GetErrorXhigh(2), getTrack(itrack)->GetErrorYlow(2), getTrack(itrack)->GetErrorYhigh(2));
+
+		gr_track_4points->SetPointY(0, getTrack(itrack)->GetPointY(0));
+		gr_track_4points->SetPointY(1, getTrack(itrack)->GetPointY(1));
+		gr_track_4points->SetPointY(2, getTrack(itrack)->GetPointY(2));
+
+		if(getTrack(itrack)->GetN()>3)
+		{
+			if(check && m_etaOut_fired.at(itrack))
+			{
+				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(4));
+				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(4));
+				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(4), getTrack(itrack)->GetErrorXhigh(4), getTrack(itrack)->GetErrorYlow(4), getTrack(itrack)->GetErrorYhigh(4));
+			}
+			else
+			{
+				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(3));
+				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(3));
+				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(3), getTrack(itrack)->GetErrorXhigh(3), getTrack(itrack)->GetErrorYlow(3), getTrack(itrack)->GetErrorYhigh(3));
+			}
+			
+		}
+	}
+
+	TF1* f_track_4points = new TF1("f_track_4points", "[0] + [1]*x", 0, 3800);
+	gr_track_4points->Fit("f_track_4points","Q");
+
+	float constant = f_track_4points->GetParameter(0);
+	float slope = f_track_4points->GetParameter(1);
+	float ndf = f_track_4points->GetNDF();
+	float chi2 = f_track_4points->GetChisquare();
+	float prob = f_track_4points->GetProb();
+	float angle = (180./TMath::Pi())*TMath::ATan(slope);
+
+	if(ilayer==0)
+	{
+		histograms->h_chi2ndf_4points_IP1->Fill(chi2/ndf);
+		histograms->h_chi2_4points_IP1->Fill(chi2);
+		histograms->h_angle_4points_IP1->Fill(m_angle);
+		histograms->h_prob_4points_IP1->Fill(prob);
+	}
+	if(ilayer==1)
+	{
+		histograms->h_chi2ndf_4points_IP2->Fill(chi2/ndf);
+		histograms->h_chi2_4points_IP2->Fill(chi2);
+		histograms->h_angle_4points_IP2->Fill(m_angle);
+		histograms->h_prob_4points_IP2->Fill(prob);
+	}
+	
+
+	if(m_etaOut_fired.at(itrack) && !check)
+	{
+		float distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
+		histograms->h_d_track_etaout_4points->Fill(distance_from_track);
+		if(distance_from_track<=eta_out_cut_eff && distance_from_track>=-eta_out_cut_eff)
+		{
+			histograms->h_d_track_etaout_cut_4points->Fill(distance_from_track);
+			if(angle>=-0.5 && angle<=0.5) histograms->h_d_track_etaout_cut_anglecut_4points->Fill(distance_from_track);
+		}
+	}
+
+	if(m_etaIn_fired.at(itrack) && check)
+	{
+		float distance_from_track = 99999.;
+		if(!m_etaOut_fired.at(itrack)) distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
+		else distance_from_track = (slope*gr_track_4points->GetPointX(4) - gr_track_4points->GetPointY(4) + constant)/(TMath::Sqrt(slope*slope + 1));
+		
+		histograms->h_d_track_etain_4points->Fill(distance_from_track);
+		if(distance_from_track<=eta_out_cut_eff && distance_from_track>=-eta_out_cut_eff)
+		{
+			histograms->h_d_track_etain_cut_4points->Fill(distance_from_track);
+			if(angle>=-0.5 && angle<=0.5) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
+		}
+	}
+
+	return gr_track_4points;
+} 
 
 inline void Track::setSM1errors(int itrack)
 {
