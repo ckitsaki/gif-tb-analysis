@@ -313,6 +313,9 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 	float prob = f_track_4points->GetProb();
 	float angle = (180./TMath::Pi())*TMath::ATan(slope);
 
+	if(prob<0.05)
+		gr_track_4points->Fit("f_track","Q");
+
 	if(ilayer==0)
 	{
 		histograms->h_chi2ndf_4points_IP1->Fill(chi2/ndf);
@@ -363,9 +366,9 @@ inline void Track::setSM1errors(int itrack)
 	for(auto& ipoint : m_map_point_charge)
 	{
 		if(!m_many_sclusters)
-			gr_track->SetPointError(ipoint.first, 5, 5, ipoint.second/(2*totalCharge), ipoint.second/(2*totalCharge));
+			gr_track->SetPointError(ipoint.first, 5, 5, /*ipoint.second/(2*totalCharge)*/0.1, 0.1/*ipoint.second/(2*totalCharge)*/);
 		else 
-			getTrack(itrack)->SetPointError(ipoint.first, 5, 5, ipoint.second/(2*totalCharge), ipoint.second/(2*totalCharge));
+			getTrack(itrack)->SetPointError(ipoint.first, 5, 5, /*ipoint.second/(2*totalCharge)*/0.1, 0.1/*ipoint.second/(2*totalCharge)*/);
 	}
 }
 
@@ -425,8 +428,8 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) histograms->h_d_track_etaout->Fill(distance_from_track);	
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isEtaOut=true;
-		 if(!m_many_sclusters && (m_angle>=-track_angle_cut && m_angle<=track_angle_cut)) histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
-		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut && getAngle(0)<=track_angle_cut)) histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
+		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
+		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)) histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
 		 
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
 		  histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
@@ -443,8 +446,8 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) histograms->h_d_track_etain->Fill(distance_from_track);
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isEtaIn=true;
-		 if(!m_many_sclusters && (m_angle>=-track_angle_cut && m_angle<=track_angle_cut)) histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
-		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut && getAngle(0)<=track_angle_cut)) histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
+		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
+		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)) histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
 		 
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
 		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
@@ -461,8 +464,8 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) histograms->h_d_track_lay2->Fill(distance_from_track);
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isStereoIn=true;
-		 if(!m_many_sclusters && (m_angle>=-track_angle_cut && m_angle<=track_angle_cut)) histograms->h_d_track_lay2_cut_anglecut->Fill(distance_from_track);
-		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut && getAngle(0)<=track_angle_cut)) histograms->h_d_track_lay2_cut_anglecut->Fill(distance_from_track);
+		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) histograms->h_d_track_lay2_cut_anglecut->Fill(distance_from_track);
+		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)) histograms->h_d_track_lay2_cut_anglecut->Fill(distance_from_track);
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles))
 		 {
 		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
@@ -479,8 +482,8 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) histograms->h_d_track_lay3->Fill(distance_from_track);
 		if(distance_from_track<=threshold && distance_from_track>=-threshold ) {
 		 m_isStereoOut=true;
-		 if(!m_many_sclusters && (m_angle>=-track_angle_cut && m_angle<=track_angle_cut)) histograms->h_d_track_lay3_cut_anglecut->Fill(distance_from_track);
-		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut && getAngle(0)<=track_angle_cut)) histograms->h_d_track_lay3_cut_anglecut->Fill(distance_from_track);
+		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) histograms->h_d_track_lay3_cut_anglecut->Fill(distance_from_track);
+		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)) histograms->h_d_track_lay3_cut_anglecut->Fill(distance_from_track);
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) 
 		 {
 		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
@@ -507,7 +510,7 @@ inline void Track::checkStereoDistanceFromTrack(int itrack, float pos_stereo_y, 
 	{
 		m_isStereo = true;
 		if(!m_many_sclusters) histograms->h_d_track_stereo_cut->Fill(distance_from_track);
-		if(!m_many_sclusters && (m_angle>=-track_angle_cut && m_angle<=track_angle_cut)) histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
+		if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
 	}
 	else m_isStereo = false;
 
@@ -848,7 +851,7 @@ inline void Track::findCandidateTrack()
 		if(ip!=0)
 			v_z_error[ip] = 10.;
 		else v_z_error[ip] = 0.;
-		v_y_error[ip] = ierr.second/2;
+		v_y_error[ip] = 0.1;//ierr.second/2;
 		ip++;
 	}
 	gr_track = new TGraphAsymmErrors(npoints, v_z, v_y, v_z_error, v_z_error, v_y_error, v_y_error);
