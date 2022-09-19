@@ -223,9 +223,20 @@ inline void Cluster::fillClusters(std::vector<int> v_sorted_fired_strips)
 
 	int it=0;
 
+	//std::cout<<m_nclusters<<" clusters.\n";
 	for(int iclus=0; iclus<m_nclusters; iclus++)
 	{
-		for(int istrip = it; istrip<v_pos.at(iclus); istrip++) v_tmp_strips_in_cluster.push_back(v_sorted_fired_strips.at(istrip));
+		for(int istrip = it; istrip<v_pos.at(iclus); istrip++)
+		{
+			//std::cout<<v_sorted_fired_strips.at(istrip)<<std::endl;
+			v_tmp_strips_in_cluster.push_back(v_sorted_fired_strips.at(istrip));	
+		} 
+	/*	if(v_tmp_strips_in_cluster.size()>8) 
+		{
+			v_tmp_strips_in_cluster.clear();
+			it = v_pos.at(iclus);
+			continue;	
+		} */
 		m_v_clusters.push_back(v_tmp_strips_in_cluster);
 		v_tmp_strips_in_cluster.clear();
 		it = v_pos.at(iclus);
