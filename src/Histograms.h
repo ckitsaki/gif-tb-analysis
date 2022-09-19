@@ -220,22 +220,22 @@ inline void Histograms::init()
 	h_real_vs_exp_position_etaout->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	h_real_vs_exp_position_etaout->GetYaxis()->SetTitle("expected position [mm]");
 
-	h_pos_diff_eta_out_in = new TH1F("h_pos_diff_eta_out_in", "eta_in - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_in = new TH1F("h_pos_diff_eta_out_in", "eta_in - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_in->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
 	
-	h_pos_diff_eta_out_stereo = new TH1F("h_pos_diff_eta_out_stereo", "stereo - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_stereo = new TH1F("h_pos_diff_eta_out_stereo", "stereo - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_stereo->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 	
-	h_pos_diff_eta_in_stereo = new TH1F("h_pos_diff_eta_in_stereo", "stereo - eta_in" ,1000, -10, 10);
+	h_pos_diff_eta_in_stereo = new TH1F("h_pos_diff_eta_in_stereo", "stereo - eta_in" ,1000, -5, 5);
 	h_pos_diff_eta_in_stereo->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 
-	h_pos_diff_eta_out_in_cutangle = new TH1F("h_pos_diff_eta_out_in_cutangle", "eta_in - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_in_cutangle = new TH1F("h_pos_diff_eta_out_in_cutangle", "eta_in - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_in_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
 	
-	h_pos_diff_eta_out_stereo_cutangle = new TH1F("h_pos_diff_eta_out_stereo_cutangle", "stereo - eta_out" ,1000, -10, 10);
+	h_pos_diff_eta_out_stereo_cutangle = new TH1F("h_pos_diff_eta_out_stereo_cutangle", "stereo - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 	
-	h_pos_diff_eta_in_stereo_cutangle = new TH1F("h_pos_diff_eta_in_stereo_cutangle", "stereo - eta_in" ,1000, -10, 10);
+	h_pos_diff_eta_in_stereo_cutangle = new TH1F("h_pos_diff_eta_in_stereo_cutangle", "stereo - eta_in" ,1000, -5, 5);
 	h_pos_diff_eta_in_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 
 	h_d_track_etaout = new TH1F("h_d_track_etaout", "Distance from track - eta_out" ,1000, -10, 10);
