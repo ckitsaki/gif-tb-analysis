@@ -218,7 +218,7 @@ inline void Track::fillSM1events(int clus_index, Cluster* clus_lay, int layIndex
 		getTrack(itrack)->SetPointX(m_ipoint, clus_lay->getZPosition());
 		getTrack(itrack)->SetPointY(m_ipoint, clus_lay->getCorrPosition(clus_index));	
 	}
-	m_map_point_charge[m_ipoint] = clus_lay->getTotPdo(clus_index);
+	m_map_point_charge[m_ipoint] = 0.4;//clus_lay->getTotPdo(clus_index);
 	m_totCharge += clus_lay->getTotPdo(clus_index);
 //	std::cout<<"POINTS: "<<gr_track->GetPointX(m_ipoint)<<" "<<gr_track->GetPointY(m_ipoint)<<std::endl;
 	if(layIndex==0)
@@ -339,7 +339,7 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		if(distance_from_track<=eta_out_cut_eff && distance_from_track>=-eta_out_cut_eff)
 		{
 			histograms->h_d_track_etaout_cut_4points->Fill(distance_from_track);
-			if(angle>=-0.5 && angle<=0.5) histograms->h_d_track_etaout_cut_anglecut_4points->Fill(distance_from_track);
+			if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etaout_cut_anglecut_4points->Fill(distance_from_track);
 		}
 	}
 
@@ -353,7 +353,7 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		if(distance_from_track<=eta_out_cut_eff && distance_from_track>=-eta_out_cut_eff)
 		{
 			histograms->h_d_track_etain_cut_4points->Fill(distance_from_track);
-			if(angle>=-0.5 && angle<=0.5) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
+			if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
 		}
 	}
 
@@ -366,9 +366,9 @@ inline void Track::setSM1errors(int itrack)
 	for(auto& ipoint : m_map_point_charge)
 	{
 		if(!m_many_sclusters)
-			gr_track->SetPointError(ipoint.first, 5, 5, /*ipoint.second/(2*totalCharge)*/0.1, 0.1/*ipoint.second/(2*totalCharge)*/);
+			gr_track->SetPointError(ipoint.first, 10, 10, /*ipoint.second/(2*totalCharge)*/ipoint.second, ipoint.second/*ipoint.second/(2*totalCharge)*/);
 		else 
-			getTrack(itrack)->SetPointError(ipoint.first, 5, 5, /*ipoint.second/(2*totalCharge)*/0.1, 0.1/*ipoint.second/(2*totalCharge)*/);
+			getTrack(itrack)->SetPointError(ipoint.first, 10, 10, /*ipoint.second/(2*totalCharge)*/ipoint.second, ipoint.second/*ipoint.second/(2*totalCharge)*/);
 	}
 }
 
@@ -396,7 +396,7 @@ inline void Track::fillStereoCluster(Cluster* clus_lay2, Cluster* clus_lay3, int
 		float stereo_pos = +0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.));
 		getTrack(itrack)->SetPointY(m_ipoint, stereo_pos);
 	}
-	m_map_point_charge[m_ipoint] = (clus_lay2->getTotPdo(ind_cl2)+clus_lay3->getTotPdo(ind_cl3));
+	m_map_point_charge[m_ipoint] = 0.4;//(clus_lay2->getTotPdo(ind_cl2)+clus_lay3->getTotPdo(ind_cl3));
 	m_totCharge += clus_lay2->getTotPdo(ind_cl2);
 	m_totCharge += clus_lay3->getTotPdo(ind_cl3);
 }
@@ -656,66 +656,76 @@ inline void Track::checkDistanceFromTrack(int itrack) // deprecated - not used
 inline void Track::findSuperClustersWithin1DegWindow()
 {
 	float pos_sby1 = m_cl_sby1->getPosition(0);
-	if(m_cl_sby2->getNClusters2()==1 && m_cl_sby3->getNClusters2()==1) //check the events with exactly one cluster on SBY2 and SBY3
+	if(m_cl_sby2->getNClusters2()==1 && m_cl_sby3->getNClusters2()==1 ) //check the events with exactly one cluster on SBY2 and SBY3
 	{
 		m_many_sclusters = false;
 		float pos_sby2 = m_cl_sby2->getCorrPosition(0);
 		float pos_sby3 = m_cl_sby3->getCorrPosition(0);
 		float totalCharge = m_cl_sby1->getTotPdo(0) + m_cl_sby2->getTotPdo(0) + m_cl_sby3->getTotPdo(0);
-		m_totCharge = totalCharge;
-		m_map_z_y[m_cl_sby1->getZPosition()] = pos_sby1;
-		m_map_z_errory[m_cl_sby1->getZPosition()] = (totalCharge - m_cl_sby1->getTotPdo(0) ) / totalCharge; 
-		float SBY2_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby2)/( std::abs(m_cl_sby2->getZPosition()-m_cl_sby1->getZPosition())) );
-		float SBY3_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby3)/( std::abs(m_cl_sby3->getZPosition()-m_cl_sby1->getZPosition())) );
-		if(std::abs(SBY2_within_1deg)<=1. && std::abs(SBY3_within_1deg)<=1. )
+		if((pos_sby2>=beam_acceptance_down && pos_sby2<=beam_acceptance_up) && (pos_sby3>=beam_acceptance_down && pos_sby3<=beam_acceptance_up))
 		{
-			m_counter_1deg++;
-			histograms->h_residual_sby2_sby3->Fill(pos_sby2-pos_sby3);
-			histograms->h_residual_sby2_sby3_accepted->Fill(pos_sby2-pos_sby3);
-			m_map_z_y[m_cl_sby2->getZPosition()] = pos_sby2;
-			m_map_z_y[m_cl_sby3->getZPosition()] = pos_sby3;
-			m_map_z_errory[m_cl_sby2->getZPosition()] = (totalCharge - m_cl_sby2->getTotPdo(0) ) / totalCharge;
-			m_map_z_errory[m_cl_sby3->getZPosition()] = (totalCharge - m_cl_sby3->getTotPdo(0) ) / totalCharge;
+			m_totCharge = totalCharge;
+			m_map_z_y[m_cl_sby1->getZPosition()] = pos_sby1;
+			m_map_z_errory[m_cl_sby1->getZPosition()] = (totalCharge - m_cl_sby1->getTotPdo(0) ) / totalCharge; 
+			float SBY2_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby2)/( std::abs(m_cl_sby2->getZPosition()-m_cl_sby1->getZPosition())) );
+			float SBY3_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby3)/( std::abs(m_cl_sby3->getZPosition()-m_cl_sby1->getZPosition())) );
+			if(std::abs(SBY2_within_1deg)<=1. && std::abs(SBY3_within_1deg)<=1. )
+			{
+				m_counter_1deg++;
+				histograms->h_residual_sby2_sby3->Fill(pos_sby2-pos_sby3);
+				histograms->h_residual_sby2_sby3_accepted->Fill(pos_sby2-pos_sby3);
+				m_map_z_y[m_cl_sby2->getZPosition()] = pos_sby2;
+				m_map_z_y[m_cl_sby3->getZPosition()] = pos_sby3;
+				m_map_z_errory[m_cl_sby2->getZPosition()] = (totalCharge - m_cl_sby2->getTotPdo(0) ) / totalCharge;
+				m_map_z_errory[m_cl_sby3->getZPosition()] = (totalCharge - m_cl_sby3->getTotPdo(0) ) / totalCharge;
+			}
+			else {
+				m_counter_outside1deg_theonly_scluster++;
+				histograms->h_residual_sby2_sby3_outside1deg_theonly_sclus->Fill(pos_sby2-pos_sby3);
+				histograms->h_residual_sby2_sby3_accepted->Fill(pos_sby2-pos_sby3);
+				m_map_z_y[m_cl_sby2->getZPosition()] = pos_sby2;
+				m_map_z_y[m_cl_sby3->getZPosition()] = pos_sby3;
+				m_map_z_errory[m_cl_sby2->getZPosition()] = (totalCharge - m_cl_sby2->getTotPdo(0) ) / totalCharge;
+				m_map_z_errory[m_cl_sby3->getZPosition()] = (totalCharge - m_cl_sby3->getTotPdo(0) ) / totalCharge;
+				histograms->h_angle_only_scluster_sby2->Fill(SBY2_within_1deg);
+				histograms->h_angle_only_scluster_sby3->Fill(SBY3_within_1deg);
+				histograms->h_dangle_only_scluster_sby2sby3->Fill(SBY2_within_1deg-SBY3_within_1deg);
+				m_the_only_supercluster_outside_1deg_window = true;
+			}
 		}
-		else {
-			m_counter_outside1deg_theonly_scluster++;
-			histograms->h_residual_sby2_sby3_outside1deg_theonly_sclus->Fill(pos_sby2-pos_sby3);
-			histograms->h_residual_sby2_sby3_accepted->Fill(pos_sby2-pos_sby3);
-			m_map_z_y[m_cl_sby2->getZPosition()] = pos_sby2;
-			m_map_z_y[m_cl_sby3->getZPosition()] = pos_sby3;
-			m_map_z_errory[m_cl_sby2->getZPosition()] = (totalCharge - m_cl_sby2->getTotPdo(0) ) / totalCharge;
-			m_map_z_errory[m_cl_sby3->getZPosition()] = (totalCharge - m_cl_sby3->getTotPdo(0) ) / totalCharge;
-			histograms->h_angle_only_scluster_sby2->Fill(SBY2_within_1deg);
-			histograms->h_angle_only_scluster_sby3->Fill(SBY3_within_1deg);
-			histograms->h_dangle_only_scluster_sby2sby3->Fill(SBY2_within_1deg-SBY3_within_1deg);
-			m_the_only_supercluster_outside_1deg_window = true;
-		}
+
 	}
 	else {
-		m_counter_more_clusters++;
+		m_counter_more_clusters++; // more clusters on the SBY2 and SBY3
 
 		for(int icl2=0; icl2<m_cl_sby2->getNClusters2(); icl2++)
 		{
 			float pos_sby2 = m_cl_sby2->getCorrPosition(icl2);
-			float SBY2_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby2)/( std::abs(m_cl_sby2->getZPosition()-m_cl_sby1->getZPosition())) );
-			
-			for(int icl3=0; icl3<m_cl_sby3->getNClusters2(); icl3++)
+			if((pos_sby2>=beam_acceptance_down && pos_sby2<=beam_acceptance_up))
 			{
-				float pos_sby3 = m_cl_sby3->getCorrPosition(icl3);
-				float SBY3_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby3)/( std::abs(m_cl_sby3->getZPosition()-m_cl_sby1->getZPosition())) );
-
-				if(std::abs(SBY2_within_1deg)<=1. && std::abs(SBY3_within_1deg)<=1. )
+				float SBY2_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby2)/( std::abs(m_cl_sby2->getZPosition()-m_cl_sby1->getZPosition())) );
+			
+				for(int icl3=0; icl3<m_cl_sby3->getNClusters2(); icl3++)
 				{
-					m_pos_sby2_sby3.insert(std::pair<float,float>(pos_sby2,pos_sby3));// [pos_sby2] = pos_sby3;
-					m_counter_more_clusters_in_1degWindow++;
-					m_many_sclusters = true;
-				}
-				else {
-					m_counter_more_clusters_out_1degWindow++;
-					histograms->h_residual_sby2_sby3_out_1deg_many_sclus->Fill(pos_sby2-pos_sby3);
-					histograms->h_residual_sby2_sby3_rejected->Fill(pos_sby2-pos_sby3);
-				}
-			} // end SBY3 for-loop
+					float pos_sby3 = m_cl_sby3->getCorrPosition(icl3);
+					if((pos_sby3>=beam_acceptance_down && pos_sby3<=beam_acceptance_up))
+					{
+						float SBY3_within_1deg = TMath::ATan( (180./TMath::Pi())* (pos_sby1-pos_sby3)/( std::abs(m_cl_sby3->getZPosition()-m_cl_sby1->getZPosition())) );
+
+						if(std::abs(SBY2_within_1deg)<=1. && std::abs(SBY3_within_1deg)<=1. )
+						{
+							m_pos_sby2_sby3.insert(std::pair<float,float>(pos_sby2,pos_sby3));// [pos_sby2] = pos_sby3;
+							m_counter_more_clusters_in_1degWindow++;
+							m_many_sclusters = true;
+						}
+						else {
+							m_counter_more_clusters_out_1degWindow++;
+							histograms->h_residual_sby2_sby3_out_1deg_many_sclus->Fill(pos_sby2-pos_sby3);
+							histograms->h_residual_sby2_sby3_rejected->Fill(pos_sby2-pos_sby3);
+						}
+					} // end geometrical acceptance cut for SBY3
+				} // end SBY3 for-loop
+			}  // end geometrical acceptance cut for SBY2
 		} // end SBY2 for-loop
 	} // end else
 }
@@ -851,7 +861,7 @@ inline void Track::findCandidateTrack()
 		if(ip!=0)
 			v_z_error[ip] = 10.;
 		else v_z_error[ip] = 0.;
-		v_y_error[ip] = 0.1;//ierr.second/2;
+		v_y_error[ip] = 0.4;//ierr.second/2;
 		ip++;
 	}
 	gr_track = new TGraphAsymmErrors(npoints, v_z, v_y, v_z_error, v_z_error, v_y_error, v_y_error);

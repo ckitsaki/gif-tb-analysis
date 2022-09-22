@@ -253,16 +253,16 @@ inline void Histograms::init()
 	h_d_track_etaout_cut_4points = new TH1F("h_d_track_etaout_cut_4points", "Distance from track - eta_out" ,10000, -10, 10);
 	h_d_track_etaout_cut_4points->GetXaxis()->SetTitle("distance [mm]");
 
-	h_d_track_etaout_cut_anglecut_4points = new TH1F("h_d_track_etaout_cut_anglecut_4points", "Distance from track - eta_out" ,10000, -10, 10);
+	h_d_track_etaout_cut_anglecut_4points = new TH1F("h_d_track_etaout_cut_anglecut_4points", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
 
-	h_d_track_etain_4points = new TH1F("h_d_track_etain_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_4points = new TH1F("h_d_track_etain_4points", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain_4points->GetXaxis()->SetTitle("distance [mm]");
 
-	h_d_track_etain_cut_4points = new TH1F("h_d_track_etain_cut_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_cut_4points = new TH1F("h_d_track_etain_cut_4points", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain_cut_4points->GetXaxis()->SetTitle("distance [mm]");
 
-	h_d_track_etain_cut_anglecut_4points = new TH1F("h_d_track_etain_cut_anglecut_4points", "Distance from track - eta_in" ,10000, -10, 10);
+	h_d_track_etain_cut_anglecut_4points = new TH1F("h_d_track_etain_cut_anglecut_4points", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_etain = new TH1F("h_d_track_etain", "Distance from track - eta_in" ,1000, -10, 10);

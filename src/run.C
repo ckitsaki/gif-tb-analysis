@@ -464,6 +464,7 @@ int run(std::string run_number, std::string sector="C14")
 
 // ==========================================   end alignment		
 
+		if( !(pos_sby1>=beam_acceptance_down && pos_sby1<=beam_acceptance_up) ) continue; //geometrical acceptance cut to make sure all chambers see the same beam spectrum
 // Track selection
 		// accept all events which give at least 1 cluster on each of SBY2 and SBY3 small chambers 
 		if(cl_lay_small[2]->getNClusters2()>0 && cl_lay_small[3]->getNClusters2()>0)
@@ -509,6 +510,7 @@ int run(std::string run_number, std::string sector="C14")
 					histos->h_nclusters_per_layer_event[iLayer]->Fill(cl_lay[iLayer]->getNClusters2()); 
 					for(int icl=0; icl<cl_lay[iLayer]->getNClusters2(); icl++)
 					{
+						if( !(cl_lay[iLayer]->getCorrPosition(icl)>=beam_acceptance_down && cl_lay[iLayer]->getCorrPosition(icl)<=beam_acceptance_up)) continue;
 						float distance = std::abs(tr_slope*cl_lay[iLayer]->getZPosition() - cl_lay[iLayer]->getCorrPosition(icl) + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1));
 						v_dclus_to_track[iLayer].push_back(distance);
 					}
@@ -529,6 +531,7 @@ int run(std::string run_number, std::string sector="C14")
 							float pos_stereo_y = +0.56 +((pos_cl3+pos_cl2) / 2*TMath::Cos(1.5*TMath::Pi()/180.)); 
 							float pos_stereo_x = ((pos_cl3-pos_cl2) / 2*TMath::Sin(1.5*TMath::Pi()/180.));
 							float distance = std::abs((tr_slope*(cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2 - pos_stereo_y + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1)));
+							if( !(pos_stereo_y>=beam_acceptance_down && pos_stereo_y<=beam_acceptance_up)) continue;
 							v_dclus_to_track_stereo.push_back(distance);
 						}
 					}
@@ -727,6 +730,7 @@ int run(std::string run_number, std::string sector="C14")
 						// first get track params
 						for(int icl=0; icl<cl_lay[iLayer]->getNClusters2(); icl++)
 						{
+							if( !(cl_lay[iLayer]->getCorrPosition(icl)>=beam_acceptance_down && cl_lay[iLayer]->getCorrPosition(icl)<=beam_acceptance_up)) continue;
 							float distance = std::abs(tr_slope*cl_lay[iLayer]->getZPosition() - cl_lay[iLayer]->getCorrPosition(icl) + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1));
 							v_dclus_to_track[iLayer].push_back(distance);
 						}
@@ -749,6 +753,7 @@ int run(std::string run_number, std::string sector="C14")
 								float pos_stereo_y = 0.56 + ((pos_cl3+pos_cl2) / 2*TMath::Cos(1.5*TMath::Pi()/180.));
 								float pos_stereo_x = ((pos_cl3-pos_cl2) / 2*TMath::Sin(1.5*TMath::Pi()/180.));	
 								float distance = std::abs(tr_slope*(cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2 - pos_stereo_y + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1));
+								if(! (pos_stereo_y>=beam_acceptance_down && pos_stereo_y<=beam_acceptance_up)) continue;
 								v_dclus_to_track_stereo.push_back(distance);
 							}
 						}
