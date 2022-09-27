@@ -46,6 +46,7 @@ public:
 
 	TH1F* h_clus_positions_corr_ontrack[4];
 	TH1F* h_clus_positions_small_corr_ontrack[4];
+	TH1F* h_clus_positions_stripIndex_corr_ontrack[4];
 
 	TH1F* h_strip_time_in_clus[4];
 	TH1F* h_strip_time_in_clus_small[4];
@@ -236,7 +237,7 @@ inline void Histograms::init()
 	h_pos_diff_eta_out_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 	
 	h_pos_diff_eta_in_stereo_cutangle = new TH1F("h_pos_diff_eta_in_stereo_cutangle", "stereo - eta_in" ,1000, -5, 5);
-	h_pos_diff_eta_in_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	h_pos_diff_eta_in_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
 
 	h_d_track_etaout = new TH1F("h_d_track_etaout", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout->GetXaxis()->SetTitle("distance [mm]");
@@ -628,6 +629,7 @@ inline void Histograms::init()
 
 		h_clus_positions_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,700, 1300, 2000);
 		h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
+		h_clus_positions_stripIndex_corr_ontrack[ilayer] = new TH1F(Form("h_clus_positions_stripIndex_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,3072, 0, 3072);
 
 		h_nclusters_per_layer_event[ilayer] = new TH1F(Form("h_nclusters_per_layer_event_%i",ilayer), Form("SM1 Layer - %i", ilayer) ,40, 0, 40);
 		
