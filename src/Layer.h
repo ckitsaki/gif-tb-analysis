@@ -148,12 +148,12 @@ inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius)
 		if(m_layerIndex==0 ) //eta layers
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
+		return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta ); 
 	}
 	else if(m_layerIndex==1)
 	{
 		// SM1
-		return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta );
+		return (m_alpha + (895+35.3+(strip+1+1)*0.425)*m_beta );
 	}
 
 	if(m_layerIndex==2 ) //stereo layers

@@ -30,6 +30,7 @@ public:
 	inline int getNStrips(int subcluster){return m_v_clusters[subcluster].size();};
 	inline void removeStrips_small(int subcluster);
 	inline float getZPosition() {return this_layer->convertLayerToGlobalZ();};
+	inline Layer* getLayer() {return this_layer;};
 
 	Layer* this_layer;
 	

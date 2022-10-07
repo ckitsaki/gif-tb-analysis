@@ -175,12 +175,16 @@ public:
 	TH1F* h_d_track_lay2_cut;
 	TH1F* h_d_track_lay3;
 	TH1F* h_d_track_lay3_cut;
+	
 
 	TH1F* h_d_track_etaout_cut_anglecut;
 	TH1F* h_d_track_etain_cut_anglecut;
 	TH1F* h_d_track_lay2_cut_anglecut;
 	TH1F* h_d_track_lay3_cut_anglecut;
 	TH1F* h_d_track_stereo_cut_anglecut;
+	TH1F* h_d_track_sby1_anglecut;
+	TH1F* h_d_track_sby2_anglecut;
+	TH1F* h_d_track_sby3_anglecut;
 
 	TH1F* h_d_track_etaout_4points;
 	TH1F* h_d_track_etaout_cut_4points;
@@ -202,6 +206,15 @@ public:
 	TH1F* h_pos_diff_eta_out_in_cutangle;
 	TH1F* h_pos_diff_eta_out_stereo_cutangle;
 	TH1F* h_pos_diff_eta_in_stereo_cutangle;
+
+	TH2F* h_pos_diff_eta_out_in_vs_eta_in_cutangle;
+	TH2F* h_pos_diff_eta_out_in_vs_eta_out_cutangle;
+
+	TH2F* h_d_track_etaout_cut_anglecut_vs_cl_pos;
+	TH2F* h_d_track_etain_cut_anglecut_vs_cl_pos;
+	TH2F* h_d_track_stereo_cut_anglecut_vs_cl_pos;
+
+	TH2F* h_align_etaout_ontrack;
 
 	Histograms();
 	inline void init();
@@ -232,6 +245,14 @@ inline void Histograms::init()
 
 	h_pos_diff_eta_out_in_cutangle = new TH1F("h_pos_diff_eta_out_in_cutangle", "eta_in - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_in_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+
+	h_pos_diff_eta_out_in_vs_eta_in_cutangle = new TH2F("h_pos_diff_eta_out_in_vs_eta_in_cutangle", "eta_in - eta_out" ,600, 1300, 1900 ,1000, -5, 5);
+	h_pos_diff_eta_out_in_vs_eta_in_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_eta_in_cutangle->GetXaxis()->SetTitle("IP2 cluster position [mm]");
+
+	h_pos_diff_eta_out_in_vs_eta_out_cutangle = new TH2F("h_pos_diff_eta_out_in_vs_eta_out_cutangle", "eta_in - eta_out" ,600, 1300, 1900 ,1000, -5, 5);
+	h_pos_diff_eta_out_in_vs_eta_out_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_eta_out_cutangle->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	
 	h_pos_diff_eta_out_stereo_cutangle = new TH1F("h_pos_diff_eta_out_stereo_cutangle", "stereo - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
@@ -245,8 +266,29 @@ inline void Histograms::init()
 	h_d_track_etaout_cut = new TH1F("h_d_track_etaout_cut", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout_cut->GetXaxis()->SetTitle("distance [mm]");
 
+	h_d_track_sby1_anglecut = new TH1F("h_d_track_sby1_anglecut", "Distance from track - SBY1" ,1000, -10, 10);
+	h_d_track_sby1_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_sby2_anglecut = new TH1F("h_d_track_sby2_anglecut", "Distance from track - SBY2" ,1000, -10, 10);
+	h_d_track_sby2_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_sby3_anglecut = new TH1F("h_d_track_sby3_anglecut", "Distance from track - SBY3" ,1000, -10, 10);
+	h_d_track_sby3_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
 	h_d_track_etaout_cut_anglecut = new TH1F("h_d_track_etaout_cut_anglecut", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout_cut_anglecut->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_etaout_cut_anglecut_vs_cl_pos = new TH2F("h_d_track_etaout_cut_anglecut_vs_cl_pos", "Distance from track - eta_out vs cluster position" ,600, 1300, 1900, 1000, -10, 10);
+	h_d_track_etaout_cut_anglecut_vs_cl_pos->GetYaxis()->SetTitle("distance [mm]");
+	h_d_track_etaout_cut_anglecut_vs_cl_pos->GetXaxis()->SetTitle("cluster position [mm]");
+
+	h_d_track_etain_cut_anglecut_vs_cl_pos = new TH2F("h_d_track_etain_cut_anglecut_vs_cl_pos", "Distance from track - eta_in vs cluster position" ,600, 1300, 1900, 1000, -10, 10);
+	h_d_track_etain_cut_anglecut_vs_cl_pos->GetYaxis()->SetTitle("distance [mm]");
+	h_d_track_etain_cut_anglecut_vs_cl_pos->GetXaxis()->SetTitle("cluster position [mm]");
+
+	h_d_track_stereo_cut_anglecut_vs_cl_pos = new TH2F("h_d_track_stereo_cut_anglecut_vs_cl_pos", "Distance from track - stereo vs cluster position" ,600, 1300, 1900, 1000, -10, 10);
+	h_d_track_stereo_cut_anglecut_vs_cl_pos->GetYaxis()->SetTitle("distance [mm]");
+	h_d_track_stereo_cut_anglecut_vs_cl_pos->GetXaxis()->SetTitle("cluster position [mm]");
 
 	h_d_track_etaout_4points = new TH1F("h_d_track_etaout_4points", "Distance from track - eta_out" ,10000, -10, 10);
 	h_d_track_etaout_4points->GetXaxis()->SetTitle("distance [mm]");
@@ -399,11 +441,11 @@ inline void Histograms::init()
 
 // histograms used for the alignment
 
-	h_diffpos_lay0 = new TH2F("h_diffpos_lay0", "", 100, -2, 2,100,1800,2400); 
+	h_diffpos_lay0 = new TH2F("h_diffpos_lay0", "", 100, -2, 2,600,1300,1900); 
 	h_diffpos_lay0->GetXaxis()->SetTitle("#Delta y(IP2-IP1) [mm]");
 	h_diffpos_lay0->GetYaxis()->SetTitle("y_{IP1} [mm]");
 
-	h_diffpos_lay1 = new TH2F("h_diffpos_lay1", "", 100, -2, 2,100,1800,2400);
+	h_diffpos_lay1 = new TH2F("h_diffpos_lay1", "", 100, -2, 2,600,1300,1900);
 	h_diffpos_lay1->GetXaxis()->SetTitle("#Delta y(IP2-IP1) [mm]");
 	h_diffpos_lay1->GetYaxis()->SetTitle("y_{IP2} [mm]");
 
@@ -450,6 +492,10 @@ inline void Histograms::init()
 	h_sby1_minus_eta_out_vs_pos_eta_out = new TH2F("h_sby1_minus_eta_out_vs_pos_eta_out", "SB1Y-IP1 vs IP1 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_eta_out_vs_pos_eta_out->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	h_sby1_minus_eta_out_vs_pos_eta_out->GetYaxis()->SetTitle("SB1Y-IP1 cluster position [mm]");
+
+	h_align_etaout_ontrack = new TH2F("h_align_etaout_ontrack", "SB1Y-IP1 vs IP1 position", 700, 1300, 2000, 700, -350, 350);
+	h_align_etaout_ontrack->GetXaxis()->SetTitle("IP1 cluster position [mm]");
+	h_align_etaout_ontrack->GetYaxis()->SetTitle("SB1Y-IP1 cluster position [mm]");
 
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in = new TH2F("h_sby1_minus_pos_eta_in_vs_pos_eta_in", "SB1Y-IP2 vs IP2 position", 700, 1300, 2000, 700, -350, 350);
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in->GetXaxis()->SetTitle("IP2 cluster position [mm]");

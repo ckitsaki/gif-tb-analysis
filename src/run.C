@@ -504,6 +504,9 @@ int run(std::string run_number, std::string sector="C14")
 				float expected_position_onSM1 = track->extrapolateTrackOnSM1(0);
 				if(track->getAngle()<=track_angle_cut_up && track->getAngle()>=-track_angle_cut_down)
 				{
+					histos->h_d_track_sby1_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack()->GetPointX(0),track->getTrack()->GetPointY(0),0));
+					histos->h_d_track_sby2_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack()->GetPointX(1),track->getTrack()->GetPointY(1),0));
+					histos->h_d_track_sby3_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack()->GetPointX(2),track->getTrack()->GetPointY(2),0));
 					histos->h_angle_cut->Fill(track->getAngle());
 					counter5++;
 					if(expected_position_onSM1<=1556) ntracks_MMFE8_1++;
@@ -648,7 +651,12 @@ int run(std::string run_number, std::string sector="C14")
 				if(track->acceptEtaOut() && track->acceptEtaIn()) 
 				{
 					histos->h_pos_diff_eta_out_in->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
-					if((track->getAngle()>=-track_angle_cut_down && track->getAngle()<=track_angle_cut_up )) histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
+					if((track->getAngle()>=-track_angle_cut_down && track->getAngle()<=track_angle_cut_up ))
+					{
+						histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
+						histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack()->GetPointY(3) ,track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack()->GetPointY(4) ,track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+					} 
 				}
 				
 				if(track->acceptEtaOut() && track->acceptStereo() )
@@ -932,6 +940,9 @@ int run(std::string run_number, std::string sector="C14")
 					if(track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up))
 					{
 						histos->h_angle_cut->Fill(track->getAngle(0));
+						histos->h_d_track_sby1_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(0)->GetPointX(0),track->getTrack(0)->GetPointY(0),0));
+						histos->h_d_track_sby2_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(0)->GetPointX(1),track->getTrack(0)->GetPointY(1),0));
+						histos->h_d_track_sby3_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(0)->GetPointX(2),track->getTrack(0)->GetPointY(2),0));
 					 	counter5++;
 					 	float expected_position_onSM1 = track->extrapolateTrackOnSM1(0);
 					 	if(expected_position_onSM1<=1556) ntracks_MMFE8_1++;
@@ -987,7 +998,11 @@ int run(std::string run_number, std::string sector="C14")
 
 						if(track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up)
 						{
-							if(track->acceptEtaOut() && track->acceptEtaIn()) histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3) );
+							if(track->acceptEtaOut() && track->acceptEtaIn()) {
+								histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3) );
+								histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack(0)->GetPointY(3) ,track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack(0)->GetPointY(4) ,track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+							} 
 							if(track->acceptEtaOut() && track->acceptStereo() )
 							{
 								if(track->acceptEtaIn()) histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3));
@@ -1059,6 +1074,9 @@ int run(std::string run_number, std::string sector="C14")
 					if(trangle>=-track_angle_cut_down && trangle<=track_angle_cut_up)
 					{
 						histos->h_angle_cut->Fill(track->getAngle(index));
+						histos->h_d_track_sby1_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(index)->GetPointX(0),track->getTrack(index)->GetPointY(0),index));
+						histos->h_d_track_sby2_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(index)->GetPointX(1),track->getTrack(index)->GetPointY(1),index));
+						histos->h_d_track_sby3_anglecut->Fill(track->Get_Distance_from_Track(track->getTrack(index)->GetPointX(2),track->getTrack(index)->GetPointY(2),index));
 						counter5++;
 						if(expected_position_onSM1<=1556) ntracks_MMFE8_1++;
 						else ntracks_MMFE8_2++;
@@ -1141,6 +1159,8 @@ int run(std::string run_number, std::string sector="C14")
 									count_SM1_eta_out_angle++;
 									etaOut_angle=true;
 									histos->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
+									histos->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill(distance_from_track, cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
+									histos->h_align_etaout_ontrack->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)), pos_sby1-cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 									if(expected_position_onSM1<=1556) etaOut_MMFE81++;
 									else etaOut_MMFE82++;
 								}
@@ -1163,6 +1183,7 @@ int run(std::string run_number, std::string sector="C14")
 									count_SM1_eta_in_angle++;
 									etaIn_angle=true;
 									histos->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
+									histos->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(distance_from_track, cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
 									if(expected_position_onSM1<=1556) etaIn_MMFE81++;
 									else etaIn_MMFE82++;
 								}
@@ -1229,6 +1250,7 @@ int run(std::string run_number, std::string sector="C14")
 								if(trangle>=-track_angle_cut_down && trangle<=track_angle_cut_up)
 								{
 									histos->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
+									histos->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(distance_from_track, v_track_info_ypos[index].at(i) );
 									count_SM1_stereo_angle++;
 									stereo_angle=true;
 								}
@@ -1241,7 +1263,12 @@ int run(std::string run_number, std::string sector="C14")
 					if(stereoin_angle && stereout_angle) count_SM1_stereo_both_angle++;
 
 					if(etaOut && etaIn) histos->h_pos_diff_eta_out_in->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3) );
-					if(etaOut_angle && etaIn_angle) histos->h_pos_diff_eta_out_in_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3) );
+					if(etaOut_angle && etaIn_angle)
+					{
+						histos->h_pos_diff_eta_out_in_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3) );
+						histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack(index)->GetPointY(3) ,track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
+						histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack(index)->GetPointY(4) ,track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
+					} 
 					if(etaOut && stereo)
 					{
 						if(etaIn) histos->h_pos_diff_eta_out_stereo->Fill(v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(3));
@@ -1409,6 +1436,8 @@ int run(std::string run_number, std::string sector="C14")
 	out_file->cd("track_candidates/anglecut");
 	histos->h_angle_cut->Write();
 	histos->h_pos_diff_eta_out_in_cutangle->Write();
+	histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Write();
+	histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Write();
 	histos->h_pos_diff_eta_out_stereo_cutangle->Write();
 	histos->h_pos_diff_eta_in_stereo_cutangle->Write();
 	histos->h_d_track_etaout_cut_anglecut->Write();
@@ -1416,6 +1445,13 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_d_track_lay2_cut_anglecut->Write();
 	histos->h_d_track_lay3_cut_anglecut->Write();
 	histos->h_d_track_stereo_cut_anglecut->Write();
+	histos->h_d_track_etaout_cut_anglecut_vs_cl_pos->Write();
+	histos->h_d_track_etain_cut_anglecut_vs_cl_pos->Write();
+	histos->h_d_track_stereo_cut_anglecut_vs_cl_pos->Write();
+	histos->h_align_etaout_ontrack->Write();
+	histos->h_d_track_sby1_anglecut->Write();
+	histos->h_d_track_sby2_anglecut->Write();
+	histos->h_d_track_sby3_anglecut->Write();
 
 	out_file->cd("track_candidates/inclusive/IP1-4points");
 	histos->h_chi2ndf_4points_IP1->Write();
@@ -1577,6 +1613,7 @@ int run(std::string run_number, std::string sector="C14")
 	std::cout<<"Stereo out (accepted) "<<stereoOut_MMFE82<<std::endl;
 
 	out_file->Close();
+	delete out_file;
 
 	delete histos;
 	delete treeReader;
