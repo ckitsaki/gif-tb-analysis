@@ -4,11 +4,11 @@ float eta_out_cut_eff_up = 1.;
 float eta_in_cut_eff_down = 1.;
 float eta_in_cut_eff_up = 1.;
 
-float stereo_in_cut_eff_down = 2.5;
-float stereo_in_cut_eff_up = 2.;
+float stereo_in_cut_eff_down = 3;
+float stereo_in_cut_eff_up = 2.5;
 
-float stereo_out_cut_eff_down = 2.;
-float stereo_out_cut_eff_up = 2.5;
+float stereo_out_cut_eff_down = 2.5;
+float stereo_out_cut_eff_up = 3;
 
 float stereo_cut_eff_down = 1.;
 float stereo_cut_eff_up = 1.;
@@ -27,5 +27,5 @@ struct correction{
 };
 	
 correction struct_eta_out = {1.19,-0.0009};
-correction struct_eta_in = {1.366,-0.001029}; //extra alpha parameter to align SM1 layers
+correction struct_eta_in = {1.366,-0.001029};
 correction struct_stereo = {1.67, -0.0012};
