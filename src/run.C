@@ -6,7 +6,6 @@
 
 int run(std::string run_number, std::string sector="C14")
 {
-
 	gROOT->SetBatch(kTRUE); 
 
 	int iev = 0;
@@ -526,6 +525,7 @@ int run(std::string run_number, std::string sector="C14")
 				{
 					if(cl_lay[iLayer]->getNClusters2()>0) count_layers_with_cluster++;
 					histos->h_nclusters_per_layer_event[iLayer]->Fill(cl_lay[iLayer]->getNClusters2()); 
+					
 					for(int icl=0; icl<cl_lay[iLayer]->getNClusters2(); icl++)
 					{
 						float distance = std::abs(tr_slope*cl_lay[iLayer]->getZPosition() - cl_lay[iLayer]->getCorrPosition(icl) + tr_const)/(TMath::Sqrt(tr_slope*tr_slope + 1));
@@ -864,11 +864,14 @@ int run(std::string run_number, std::string sector="C14")
 						float pos_stereo_z = (cl_lay[3]->getZPosition() + cl_lay[2]->getZPosition() ) / 2;
 						if(track->checkIfSingleTrack()) 
 						{ 
+							float alpha_corr = struct_stereo.alpha_corr;
+							float beta=1/TMath::Sqrt(track->trackSlope(0)*track->trackSlope(0) + 1);
+							float beta_corr = struct_stereo.beta_corr + beta;
 							histos->h_d_track_ystereo->Fill(min_distance);
 							histos->h_beamProfile_ontrack->Fill(pos_stereo_y, pos_stereo_x);
 							histos->h_d_track_lay2->Fill(track->Get_Distance_from_Track(cl_lay[2]->getZPosition(), cl_lay[2]->getCorrPosition(ind_lay2), itrack));
 							histos->h_d_track_lay3->Fill(track->Get_Distance_from_Track(cl_lay[3]->getZPosition(), cl_lay[3]->getCorrPosition(ind_lay3), itrack));
-							float st_dist_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2, pos_stereo_y, itrack);
+							float st_dist_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2, alpha_corr + beta_corr*pos_stereo_y, itrack);
 							histos->h_d_track_stereo->Fill(st_dist_from_track);
 							if(st_dist_from_track<=stereo_cut_eff_up && st_dist_from_track>=-stereo_cut_eff_down)
 							{
@@ -1139,16 +1142,36 @@ int run(std::string run_number, std::string sector="C14")
 
 					for(int i=0; i<v_track_info_layer[index].size(); i++)
 					{
+						float alpha_corr = 0;
+						float beta_corr = 1;
+						float beta = beta = 1/TMath::Sqrt(track->trackSlope(index)*track->trackSlope(index) + 1);
+	
+						if(v_track_info_layer[index].at(i)==0)
+						{
+							alpha_corr = struct_eta_out.alpha_corr;
+							beta_corr = struct_eta_out.beta_corr + beta;
+						}
+						if(v_track_info_layer[index].at(i)==1)
+						{
+							alpha_corr = struct_eta_in.alpha_corr;
+							beta_corr = struct_eta_in.beta_corr + beta;
+						}
+						if(v_track_info_layer[index].at(i)==-1)
+						{
+							alpha_corr = struct_stereo.alpha_corr;
+							beta_corr = struct_stereo.beta_corr + beta;
+						}
+
 						float distance_from_track = 9999;
-						if(v_track_info_layer[index].at(i)>-1) distance_from_track = track->Get_Distance_from_Track(cl_lay[(int)v_track_info_layer[index].at(i)]->getZPosition(), v_track_info_ypos[index].at(i), index);
-						else distance_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition() + cl_lay[3]->getZPosition())/2, v_track_info_ypos[index].at(i), index);
+						if(v_track_info_layer[index].at(i)>-1) distance_from_track = track->Get_Distance_from_Track(cl_lay[(int)v_track_info_layer[index].at(i)]->getZPosition(), alpha_corr + beta_corr*v_track_info_ypos[index].at(i), index);
+						else distance_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition() + cl_lay[3]->getZPosition())/2, alpha_corr + beta_corr*v_track_info_ypos[index].at(i), index);
 						
 						if(v_track_info_layer[index].at(i)==0) // eta_out
 						{
 							histos->h_d_track_etaout->Fill(distance_from_track);
 							if(distance_from_track<=eta_out_cut_eff_up && distance_from_track>=-eta_out_cut_eff_down)
 							{
-								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill( alpha_corr + beta_corr*cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_clus_positions_stripIndex_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getStrip_from_clpos(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i))));
 								histos->h_d_track_etaout_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
@@ -1159,7 +1182,7 @@ int run(std::string run_number, std::string sector="C14")
 									count_SM1_eta_out_angle++;
 									etaOut_angle=true;
 									histos->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
-									histos->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill(distance_from_track, cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
+									histos->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill(distance_from_track, alpha_corr + beta_corr*cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
 									histos->h_align_etaout_ontrack->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)), pos_sby1-cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 									if(expected_position_onSM1<=1556) etaOut_MMFE81++;
 									else etaOut_MMFE82++;
@@ -1172,7 +1195,7 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_d_track_etain->Fill(distance_from_track);
 							if(distance_from_track<=eta_in_cut_eff_up && distance_from_track>=-eta_in_cut_eff_down)
 							{
-								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
+								histos->h_clus_positions_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(alpha_corr + beta_corr*cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)));
 								histos->h_clus_positions_stripIndex_corr_ontrack[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getStrip_from_clpos(cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i))));
 								histos->h_d_track_etain_cut->Fill(distance_from_track);
 								histos->h_cl_charge_on_track[(int)v_track_info_layer[index].at(i)]->Fill(cl_lay[(int)v_track_info_layer[index].at(i)]->getTotPdo(v_track_info_cl_indices[index].at(i)));
@@ -1183,7 +1206,7 @@ int run(std::string run_number, std::string sector="C14")
 									count_SM1_eta_in_angle++;
 									etaIn_angle=true;
 									histos->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
-									histos->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(distance_from_track, cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
+									histos->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(distance_from_track, alpha_corr + beta_corr*cl_lay[(int)v_track_info_layer[index].at(i)]->getCorrPosition(v_track_info_cl_indices[index].at(i)) );
 									if(expected_position_onSM1<=1556) etaIn_MMFE81++;
 									else etaIn_MMFE82++;
 								}
@@ -1245,12 +1268,12 @@ int run(std::string run_number, std::string sector="C14")
 							{
 								//std::cout<<distance_from_track<<std::endl;
 								histos->h_d_track_stereo_cut->Fill(distance_from_track);
-								histos->h_beamProfile_ontrack->Fill(v_track_info_ypos[index].at(i), v_track_info_xpos[index].at(i));
+								histos->h_beamProfile_ontrack->Fill(alpha_corr + beta_corr*v_track_info_ypos[index].at(i), v_track_info_xpos[index].at(i));
 								count_SM1_stereo++;
 								if(trangle>=-track_angle_cut_down && trangle<=track_angle_cut_up)
 								{
 									histos->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
-									histos->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(distance_from_track, v_track_info_ypos[index].at(i) );
+									histos->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(distance_from_track, alpha_corr + beta_corr*v_track_info_ypos[index].at(i) );
 									count_SM1_stereo_angle++;
 									stereo_angle=true;
 								}

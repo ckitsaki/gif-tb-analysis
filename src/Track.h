@@ -8,6 +8,7 @@
 class Histograms;
 class Cluster;
 class Track{
+
 public:
 	Track(){};
 	Track(Cluster* cl_SBY1, Cluster* cl_SBY2, Cluster* cl_SBY3, Histograms* histos); //constructor
@@ -202,23 +203,55 @@ inline Track::Track(Cluster* cl_SBY1, Cluster* cl_SBY2, Cluster* cl_SBY3, Histog
 
 inline void Track::fillSM1events(int clus_index, Cluster* clus_lay, int layIndex, int itrack)
 {
+
+	float alpha_corr = 0;
+	float beta_corr = 1;
+	float beta=0;
+	
 	if(!m_many_sclusters)
 	{
+	
+		beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
 		m_ipoint++;
+	
+		if(layIndex==0)
+		{
+			alpha_corr = struct_eta_out.alpha_corr;
+			beta_corr = struct_eta_out.beta_corr + beta;
+		}
+		if(layIndex==1)
+		{
+			alpha_corr = struct_eta_in.alpha_corr;
+			beta_corr = struct_eta_in.beta_corr + beta;
+		}
+	
 		gr_track->SetPointX(m_ipoint, clus_lay->getZPosition());
-		gr_track->SetPointY(m_ipoint, clus_lay->getCorrPosition(clus_index));
+		gr_track->SetPointY(m_ipoint, alpha_corr + beta_corr*clus_lay->getCorrPosition(clus_index));
 	}
 	else 
 	{
+		
+		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
 		if(getTrack(itrack)->GetN()<4) m_ipoint=2;
 		m_ipoint++;
 		
 		if(itrack>0 && getTrack(itrack)->GetN()<4){
 		 m_map_point_charge.clear();
 		// std::cout<<m_ipoint<<std::endl;
-		}	
+		}
+		if(layIndex==0)
+		{
+			alpha_corr = struct_eta_out.alpha_corr;
+			beta_corr = struct_eta_out.beta_corr + beta;
+		}
+		if(layIndex==1)
+		{
+			alpha_corr = struct_eta_in.alpha_corr;
+			beta_corr = struct_eta_in.beta_corr + beta;
+		}
+	
 		getTrack(itrack)->SetPointX(m_ipoint, clus_lay->getZPosition());
-		getTrack(itrack)->SetPointY(m_ipoint, clus_lay->getCorrPosition(clus_index));	
+		getTrack(itrack)->SetPointY(m_ipoint, alpha_corr + beta_corr*clus_lay->getCorrPosition(clus_index));	
 	}
 	m_map_point_charge[m_ipoint] = clus_lay->getTotPdo(clus_index);
 	m_totCharge += clus_lay->getTotPdo(clus_index);
@@ -396,17 +429,27 @@ inline float Track::Get_Distance_from_Track(float z, float y, int itrack)
 
 inline void Track::fillStereoCluster(Cluster* clus_lay2, Cluster* clus_lay3, int ind_cl2, int ind_cl3, int itrack)
 {
+	float alpha_corr = 0;
+	float beta_corr = 1;
+	float beta=0;
+
 	m_ipoint++;
 	if(!m_many_sclusters)
 	{
+		beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
+		alpha_corr = struct_stereo.alpha_corr;
+		beta_corr = struct_stereo.beta_corr + beta;
 		gr_track->SetPointX(m_ipoint, (clus_lay2->getZPosition() + clus_lay3->getZPosition() )/2 );
-		float stereo_pos = +0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.));
-		gr_track->SetPointY(m_ipoint, stereo_pos);
+		float stereo_pos = (+0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)));
+		gr_track->SetPointY(m_ipoint, alpha_corr + beta_corr*stereo_pos);
 	}
 	else {
+		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
+		alpha_corr = struct_stereo.alpha_corr;
+		beta_corr = struct_stereo.beta_corr + beta;
 		getTrack(itrack)->SetPointX(m_ipoint, (clus_lay2->getZPosition() + clus_lay3->getZPosition() )/2 );
-		float stereo_pos = +0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.));
-		getTrack(itrack)->SetPointY(m_ipoint, stereo_pos);
+		float stereo_pos = (+0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)));
+		getTrack(itrack)->SetPointY(m_ipoint, alpha_corr + beta_corr*stereo_pos);
 	}
 	m_map_point_charge[m_ipoint] = (clus_lay2->getTotPdo(ind_cl2)+clus_lay3->getTotPdo(ind_cl3));
 	m_totCharge += clus_lay2->getTotPdo(ind_cl2);
@@ -431,8 +474,29 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 	float distance_from_track = 9999.;
 	float pos_sby1 = m_cl_sby1->getPosition(0);
 
-	if(!m_many_sclusters) distance_from_track = (m_slope*cluster->getZPosition() - cluster->getCorrPosition(index) + m_intercept)/(TMath::Sqrt(m_slope*m_slope + 1));
-	else distance_from_track = (trackSlope(itrack)*cluster->getZPosition() - cluster->getCorrPosition(index) + trackIntercept(itrack))/(TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1));
+	float alpha_corr = 0;
+	float beta_corr = 1;
+	float beta=0;
+	if (!m_many_sclusters){
+	 beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
+	}
+	else{
+		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
+	}
+	
+	if(layer==0)
+	{
+		alpha_corr = struct_eta_out.alpha_corr;
+		beta_corr = struct_eta_out.beta_corr + beta;
+	}
+	if(layer==1)
+	{
+		alpha_corr = struct_eta_in.alpha_corr;
+		beta_corr = struct_eta_in.beta_corr + beta;
+	}
+	
+	if(!m_many_sclusters) distance_from_track = (m_slope*cluster->getZPosition() - (alpha_corr + beta_corr*cluster->getCorrPosition(index)) + m_intercept)/(TMath::Sqrt(m_slope*m_slope + 1));
+	else distance_from_track = (trackSlope(itrack)*cluster->getZPosition() - (alpha_corr + beta_corr*cluster->getCorrPosition(index)) + trackIntercept(itrack))/(TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1));
 
 	if(m_many_sclusters && !m_mult_track_singles && layer<2) m_v_distances.push_back(distance_from_track);
 	
@@ -443,19 +507,19 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		 m_isEtaOut=true;
 		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)){
 		  histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
-		  histograms->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill(cluster->getCorrPosition(index), distance_from_track);
-		  histograms->h_align_etaout_ontrack->Fill(cluster->getCorrPosition(index), pos_sby1-cluster->getCorrPosition(index));
+		  histograms->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill((alpha_corr + beta_corr*cluster->getCorrPosition(index)), distance_from_track);
+		  histograms->h_align_etaout_ontrack->Fill((alpha_corr + beta_corr*cluster->getCorrPosition(index)), pos_sby1-(alpha_corr + beta_corr*cluster->getCorrPosition(index)));
 		}
 		 
 		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)){
 		  histograms->h_d_track_etaout_cut_anglecut->Fill(distance_from_track);
-		  histograms->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill(cluster->getCorrPosition(index), distance_from_track);
-		  histograms->h_align_etaout_ontrack->Fill(cluster->getCorrPosition(index), pos_sby1-cluster->getCorrPosition(index));
+		  histograms->h_d_track_etaout_cut_anglecut_vs_cl_pos->Fill((alpha_corr + beta_corr*cluster->getCorrPosition(index)), distance_from_track);
+		  histograms->h_align_etaout_ontrack->Fill((alpha_corr + beta_corr*cluster->getCorrPosition(index)), pos_sby1-(alpha_corr + beta_corr*cluster->getCorrPosition(index)));
 		}
 		 
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
-		  histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
-		  histograms->h_clus_positions_stripIndex_corr_ontrack[layer]->Fill(cluster->getStrip_from_clpos(cluster->getCorrPosition(index)));
+		  histograms->h_clus_positions_corr_ontrack[layer]->Fill((alpha_corr + beta_corr*cluster->getCorrPosition(index)));
+		  histograms->h_clus_positions_stripIndex_corr_ontrack[layer]->Fill(cluster->getStrip_from_clpos((alpha_corr + beta_corr*cluster->getCorrPosition(index))));
 		  histograms->h_d_track_etaout_cut->Fill(distance_from_track);
 		  histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
 		  histograms->h_nstrips_on_track[layer]->Fill(cluster->getNStrips(index));
@@ -472,16 +536,16 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		 if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up))
 		 {
 		 	 histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
-		 	 histograms->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(cluster->getCorrPosition(index), distance_from_track);
+		 	 histograms->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(alpha_corr + beta_corr*cluster->getCorrPosition(index), distance_from_track);
 		 }
 		 if((m_many_sclusters && m_mult_track_singles) && (getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up)) 
 		 {
 		 	histograms->h_d_track_etain_cut_anglecut->Fill(distance_from_track);
-		 	histograms->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(cluster->getCorrPosition(index), distance_from_track);
+		 	histograms->h_d_track_etain_cut_anglecut_vs_cl_pos->Fill(alpha_corr + beta_corr*cluster->getCorrPosition(index), distance_from_track);
 		 }
 		  
 		 if(!m_many_sclusters || (m_many_sclusters && m_mult_track_singles)) {
-		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(cluster->getCorrPosition(index));
+		 	histograms->h_clus_positions_corr_ontrack[layer]->Fill(alpha_corr + beta_corr*cluster->getCorrPosition(index));
 		 	histograms->h_clus_positions_stripIndex_corr_ontrack[layer]->Fill(cluster->getStrip_from_clpos(cluster->getCorrPosition(index)));
 		 	histograms->h_d_track_etain_cut->Fill(distance_from_track);
 		 	histograms->h_cl_charge_on_track[layer]->Fill(cluster->getTotPdo(index));
@@ -537,9 +601,18 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 
 inline void Track::checkStereoDistanceFromTrack(int itrack, float pos_stereo_y, float pos_stereo_z, float stereo_cut_eff_down, float stereo_cut_eff_up)
 {
+	float alpha_corr = 0;
+	float beta_corr = 1;
+	float beta=0;
+	if(!m_many_sclusters) beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
+	else beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
+	
+	alpha_corr = struct_stereo.alpha_corr;
+	beta_corr = struct_stereo.beta_corr + beta;
+
 	float distance_from_track = 9999.;
-	if(!m_many_sclusters ) distance_from_track = (m_slope*pos_stereo_z - pos_stereo_y + m_intercept)/(TMath::Sqrt(m_slope*m_slope + 1));
-	else distance_from_track = (trackSlope(itrack)*pos_stereo_z - pos_stereo_y + trackIntercept(itrack))/(TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1));
+	if(!m_many_sclusters ) distance_from_track = (m_slope*pos_stereo_z - (alpha_corr+beta_corr*pos_stereo_y) + m_intercept)/(TMath::Sqrt(m_slope*m_slope + 1));
+	else distance_from_track = (trackSlope(itrack)*pos_stereo_z - (alpha_corr+beta_corr*pos_stereo_y) + trackIntercept(itrack))/(TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1));
 
 	if(m_many_sclusters && !m_mult_track_singles) m_v_distances.push_back(distance_from_track);
 
@@ -550,12 +623,12 @@ inline void Track::checkStereoDistanceFromTrack(int itrack, float pos_stereo_y, 
 		m_isStereo = true;
 		if(!m_many_sclusters) {
 		 histograms->h_d_track_stereo_cut->Fill(distance_from_track);
-		 histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(pos_stereo_y, distance_from_track);
+		 histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
 		}
 		if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) 
 		{
 			histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
-			histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(pos_stereo_y, distance_from_track);
+			histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
 		}
 	}
 	else m_isStereo = false;
