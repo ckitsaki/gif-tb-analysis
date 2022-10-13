@@ -343,8 +343,7 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(3));
 				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(3));
 				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(3), getTrack(itrack)->GetErrorXhigh(3), getTrack(itrack)->GetErrorYlow(3), getTrack(itrack)->GetErrorYhigh(3));
-			}
-			
+			}	
 		}
 	}
 
@@ -361,12 +360,24 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 	if(prob<0.05)
 		gr_track_4points->Fit("f_track","Q");
 
+	float distance_from_track = 99999.;
 	if(ilayer==0)
 	{
 		histograms->h_chi2ndf_4points_IP1->Fill(chi2/ndf);
 		histograms->h_chi2_4points_IP1->Fill(chi2);
 		histograms->h_angle_4points_IP1->Fill(m_angle);
 		histograms->h_prob_4points_IP1->Fill(prob);
+
+		if(m_etaOut_fired.at(itrack) )
+		{
+			distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
+			histograms->h_d_track_etaout_4points->Fill(distance_from_track);
+			if(distance_from_track<=eta_out_cut_eff_up && distance_from_track>=-eta_out_cut_eff_down)
+			{
+				histograms->h_d_track_etaout_cut_4points->Fill(distance_from_track);
+				if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etaout_cut_anglecut_4points->Fill(distance_from_track);
+			}
+		}
 	}
 	if(ilayer==1)
 	{
@@ -374,34 +385,22 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		histograms->h_chi2_4points_IP2->Fill(chi2);
 		histograms->h_angle_4points_IP2->Fill(m_angle);
 		histograms->h_prob_4points_IP2->Fill(prob);
+
+		if(m_etaIn_fired.at(itrack) )
+		{
+			distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
+			//else distance_from_track = (slope*gr_track_4points->GetPointX(4) - gr_track_4points->GetPointY(4) + constant)/(TMath::Sqrt(slope*slope + 1));
+			//std::cout<<"itrack-"<<itrack<<" ilayer-"<<ilayer<<" D="<<distance_from_track<<" "<<m_etaOut_fired.at(itrack)<<std::endl;
+			histograms->h_d_track_etain_4points->Fill(distance_from_track);
+			if(distance_from_track<=eta_in_cut_eff_up && distance_from_track>=-eta_in_cut_eff_down)
+			{
+				histograms->h_d_track_etain_cut_4points->Fill(distance_from_track);
+				if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
+			}
+		}
 	}
 	
-
-	if(m_etaOut_fired.at(itrack) && !check)
-	{
-		float distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
-		histograms->h_d_track_etaout_4points->Fill(distance_from_track);
-		if(distance_from_track<=eta_out_cut_eff_up && distance_from_track>=-eta_out_cut_eff_down)
-		{
-			histograms->h_d_track_etaout_cut_4points->Fill(distance_from_track);
-			if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etaout_cut_anglecut_4points->Fill(distance_from_track);
-		}
-	}
-
-	if(m_etaIn_fired.at(itrack) && check)
-	{
-		float distance_from_track = 99999.;
-		if(!m_etaOut_fired.at(itrack)) distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
-		else distance_from_track = (slope*gr_track_4points->GetPointX(4) - gr_track_4points->GetPointY(4) + constant)/(TMath::Sqrt(slope*slope + 1));
-		
-		histograms->h_d_track_etain_4points->Fill(distance_from_track);
-		if(distance_from_track<=eta_out_cut_eff_up && distance_from_track>=-eta_out_cut_eff_down)
-		{
-			histograms->h_d_track_etain_cut_4points->Fill(distance_from_track);
-			if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
-		}
-	}
-
+	
 	return gr_track_4points;
 } 
 
