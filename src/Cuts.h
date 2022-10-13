@@ -17,8 +17,8 @@ float track_angle_cut_up = 0.5;
 float track_angle_cut_down = 0.5;
 
 // this cut is inserted to make sure that all chambers see the same beam spectrum.
-float beam_acceptance_up = 1750;
-float beam_acceptance_down = 1400;
+float beam_acceptance_up = 1740;//1750;
+float beam_acceptance_down = 1590;//1400;
 
 // need to perform an extra alignment based on the tracking
 struct correction{
@@ -27,5 +27,7 @@ struct correction{
 };
 	
 correction struct_eta_out = {1.19,-0.0009};
-correction struct_eta_in = {1.366,-0.001029};
-correction struct_stereo = {1.67, -0.0012};
+correction struct_eta_in = {1.19-0.03,-0.0009};
+correction struct_stereo = {1.19-0.03, -0.0009};
+//correction struct_eta_in = {1.366,-0.001029};
+//correction struct_stereo = {1.67, -0.0012};
