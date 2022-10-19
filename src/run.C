@@ -53,6 +53,7 @@ int run(std::string run_number, std::string sector="C14")
 	out_file->mkdir("track_candidates/SM1");
 	out_file->mkdir("track_candidates/inclusive/IP1-4points/track_displays");
 	out_file->mkdir("track_candidates/inclusive/IP2-4points/track_displays");
+	out_file->mkdir("track_candidates/inclusive/stereo-4points/track_displays");
 	
 	gROOT->cd();
 
@@ -592,11 +593,13 @@ int run(std::string run_number, std::string sector="C14")
 					track->checkStereoDistanceFromTrack(0, pos_stereo_y, pos_stereo_z, stereo_cut_eff_down, stereo_cut_eff_up);
 					track->fillStereoCluster(cl_lay[2], cl_lay[3], ind_lay2, ind_lay3, 0);  // fill the graph with the stereo point if both stereo layers give a hit
 				}
+				else track->stereo_fired();
 				
 				if(track->getTrack()->GetN()>3) track->setSM1errors(0);
 				
 				TGraphAsymmErrors* gr_track_4points_IP1;
 				TGraphAsymmErrors* gr_track_4points_IP2;
+				TGraphAsymmErrors* gr_track_4points_stereo;
 				
 				if(track->etaOut_fired(0))
 				{
@@ -608,6 +611,12 @@ int run(std::string run_number, std::string sector="C14")
 					gr_track_4points_IP2 = track->track4points(0,1);
 					gr_track_4points_IP2->SetName(Form("gr_track_4points_IP2_%i",iEvent));
 				}
+
+				if(track->stereo_fired(0))
+				{
+					gr_track_4points_stereo = track->track4points(0,-1);
+					gr_track_4points_stereo->SetName(Form("gr_track_4points_stereo_%i",iEvent));
+				} 
 				
 				histos->h_clus_positions_small_corr_ontrack[1]->Fill(track->getTrack()->GetPointY(0)); // cluster position on SBY1
 				histos->h_clus_positions_small_corr_ontrack[2]->Fill(track->getTrack()->GetPointY(1)); // cluster position on SBY2
@@ -648,14 +657,33 @@ int run(std::string run_number, std::string sector="C14")
 					else stereoOut_MMFE82++;
 				} 
 				// fill cluster position difference
+
 				if(track->acceptEtaOut() && track->acceptEtaIn()) 
 				{
+
 					histos->h_pos_diff_eta_out_in->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
 					if((track->getAngle()>=-track_angle_cut_down && track->getAngle()<=track_angle_cut_up ))
 					{
+						float alpha_corr = struct_eta_in_out_angle.alpha_corr;
+						float beta_corr = struct_eta_in_out_angle.beta_corr;
+
+						histos->h_pos_diff_eta_out_in_cutangle_corr->Fill( track->getTrack()->GetPointY(4) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()) );
+						histos->h_pos_diff_eta_out_in_vs_angle_cutangle_corr->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()) );
+						
 						histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
 						histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack()->GetPointY(3) ,track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
 						histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack()->GetPointY(4) ,track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						histos->h_pos_diff_eta_out_in_vs_angle_cutangle->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
+						histos->h_pos_eta_out_vs_eta_in_ontrack_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(3));
+						
+						histos->h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(3), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						histos->h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						
+						histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(3), track->getAngle());
+					//	histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill( eta_out_corr, track->getAngle());
+						histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(4), track->getAngle());
+					//	histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill( eta_in_corr, track->getAngle());
+					//	histos->h_pos_diff_eta_out_in_vs_evtno_cutangle->Fill(iEvent, track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3) );
 					} 
 				}
 				
@@ -666,8 +694,39 @@ int run(std::string run_number, std::string sector="C14")
 
 					if((track->getAngle()>=-track_angle_cut_down && track->getAngle()<=track_angle_cut_up ))
 					{
-						if(track->acceptEtaIn()) histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3));
-						else histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						float alpha_corr = struct_eta_stereo_out_angle.alpha_corr;
+						float beta_corr = struct_eta_stereo_out_angle.beta_corr;
+
+						histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), track->getAngle() );
+						//histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, track->getAngle() );
+					//	histos->h_pos_stereo_vs_angle_cutangle_corr->Fill( eta_stereo_corr, track->getAngle());
+					//	histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill( eta_out_corr, track->getAngle());
+						
+						if(track->acceptEtaIn()){
+						 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(track->getAngle(), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(5), track->getAngle());
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(4), track->getAngle());
+					//	 histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill( eta_in_corr, track->getAngle());
+						 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack()->GetPointY(5), track->getTrack()->GetPointY(3));
+
+						 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill( track->getTrack()->GetPointY(5) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(), track->getTrack()->GetPointY(5) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(3), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(5), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(3), track->getAngle());
+						}
+						else{
+						 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill(track->getTrack()->GetPointY(4) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - (track->getTrack()->GetPointY(3) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(4), track->getAngle());
+						 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(3), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						}
 					}
 				}
 				if(track->acceptEtaIn() && track->acceptStereo() ) 
@@ -676,9 +735,39 @@ int run(std::string run_number, std::string sector="C14")
 					else histos->h_pos_diff_eta_in_stereo->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
 
 					if((track->getAngle()>=-track_angle_cut_down && track->getAngle()<=track_angle_cut_up ))
-					{
-						if(track->acceptEtaOut()) histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
-						else histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+					{	
+						float alpha_corr = struct_eta_stereo_in_angle.alpha_corr;
+						float beta_corr = struct_eta_stereo_in_angle.beta_corr;
+
+						histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), track->getAngle() );
+						//histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, track->getAngle() );
+						//histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill( eta_in_corr, track->getAngle());
+						if(track->acceptEtaOut()) {
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(), track->getTrack()->GetPointY(5) - (track->getTrack()->GetPointY(4) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill(track->getTrack()->GetPointY(5) - (track->getTrack()->GetPointY(4) + alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(track->getAngle(), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(4), track->getAngle());
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(5), track->getAngle());
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(3), track->getAngle());
+					//	 histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill( eta_out_corr, track->getAngle());
+						 histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4), track->getAngle());
+						 histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(5), track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4), track->getAngle());
+						// histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack()->GetPointY(5) - track->getTrack()->GetPointY(4));
+						}
+						else {
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - ( track->getTrack()->GetPointY(3) +alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill( track->getTrack()->GetPointY(4) - ( track->getTrack()->GetPointY(3) +alpha_corr + beta_corr*track->getAngle()));
+						 histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(track->getAngle(), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack()->GetPointY(4), track->getAngle());
+						 histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(3));
+						 histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(3), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						 histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack()->GetPointY(4), track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3), track->getAngle());
+						// histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack()->GetPointY(4) - track->getTrack()->GetPointY(3));
+						}
 					}
 				}
 		
@@ -702,6 +791,13 @@ int run(std::string run_number, std::string sector="C14")
 					gr_track_4points_IP2->SetTitle(Form("Event-%i",iEvent));
 					gr_track_4points_IP2->Write();
 				}
+
+				if(track->stereo_fired(0) && count_events < 101 && count_layers_with_cluster>0)
+				{
+					out_file->cd("track_candidates/inclusive/stereo-4points/track_displays");
+					gr_track_4points_stereo->SetTitle(Form("Event-%i",iEvent));
+					gr_track_4points_stereo->Write();
+				}   
 				for(int i=0; i<4; i++)
 				{
 					v_dclus_to_track[i].clear();
@@ -871,14 +967,14 @@ int run(std::string run_number, std::string sector="C14")
 							histos->h_beamProfile_ontrack->Fill(pos_stereo_y, pos_stereo_x);
 							histos->h_d_track_lay2->Fill(track->Get_Distance_from_Track(cl_lay[2]->getZPosition(), cl_lay[2]->getCorrPosition(ind_lay2), itrack));
 							histos->h_d_track_lay3->Fill(track->Get_Distance_from_Track(cl_lay[3]->getZPosition(), cl_lay[3]->getCorrPosition(ind_lay3), itrack));
-							float st_dist_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2, alpha_corr + beta_corr*pos_stereo_y, itrack);
-							histos->h_d_track_stereo->Fill(st_dist_from_track);
-							if(st_dist_from_track<=stereo_cut_eff_up && st_dist_from_track>=-stereo_cut_eff_down)
-							{
-								histos->h_d_track_stereo_cut->Fill(st_dist_from_track);
-								if(track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up)
-									histos->h_d_track_stereo_cut_anglecut->Fill(st_dist_from_track);
-							}
+							//float st_dist_from_track = track->Get_Distance_from_Track( (cl_lay[2]->getZPosition()+cl_lay[3]->getZPosition())/2, alpha_corr + beta_corr*pos_stereo_y, itrack);
+							//histos->h_d_track_stereo->Fill(st_dist_from_track);
+							//if(st_dist_from_track<=stereo_cut_eff_up && st_dist_from_track>=-stereo_cut_eff_down)
+							//{
+							//	histos->h_d_track_stereo_cut->Fill(st_dist_from_track);
+							//	if(track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up)
+							//		histos->h_d_track_stereo_cut_anglecut->Fill(st_dist_from_track);
+							//}
 						}
 						if(!track->checkIfSingleTrack())
 						{
@@ -891,6 +987,7 @@ int run(std::string run_number, std::string sector="C14")
 						track->checkStereoDistanceFromTrack(itrack, pos_stereo_y, pos_stereo_z, stereo_cut_eff_down, stereo_cut_eff_up);
 						track->fillStereoCluster(cl_lay[2], cl_lay[3], ind_lay2, ind_lay3, itrack);
 					}
+					else track->stereo_fired();
 					
 					if(track->getTrack(itrack)->GetN()>3) track->setSM1errors(itrack);
 					if(track->checkIfSingleTrack()) {
@@ -916,6 +1013,7 @@ int run(std::string run_number, std::string sector="C14")
 					if(track->checkIfSingleTrack()) {
 						TGraphAsymmErrors* gr_track_4points_IP1;
 						TGraphAsymmErrors* gr_track_4points_IP2;
+						TGraphAsymmErrors* gr_track_4points_stereo;
 						if(track->etaOut_fired(0))
 						{
 							gr_track_4points_IP1 = track->track4points(0,0);
@@ -938,6 +1036,17 @@ int run(std::string run_number, std::string sector="C14")
 								gr_track_4points_IP2->Write();
 							}
 						}
+						if(track->stereo_fired(0))
+						{
+							gr_track_4points_stereo = track->track4points(0,-1);
+							gr_track_4points_stereo->SetName(Form("gr_track_4points_stereo_0_%i",iEvent));
+							if(count_events < 101)
+							{
+								out_file->cd("track_candidates/inclusive/stereo-4points/track_displays");
+								gr_track_4points_stereo->SetTitle(Form("Event-%i",iEvent));
+								gr_track_4points_stereo->Write();
+							}
+						} 
 						counter3++;
 					} 
 					if(track->checkIfSingleTrack() && (track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up))
@@ -1002,19 +1111,102 @@ int run(std::string run_number, std::string sector="C14")
 						if(track->getAngle(0)>=-track_angle_cut_down && track->getAngle(0)<=track_angle_cut_up)
 						{
 							if(track->acceptEtaOut() && track->acceptEtaIn()) {
+								float alpha_corr = struct_eta_in_out_angle.alpha_corr;
+								float beta_corr = struct_eta_in_out_angle.beta_corr;
+
+								histos->h_pos_diff_eta_out_in_cutangle_corr->Fill( track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)) );
+								histos->h_pos_diff_eta_out_in_vs_angle_cutangle_corr->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)) );
+
 								histos->h_pos_diff_eta_out_in_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3) );
 								histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack(0)->GetPointY(3) ,track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
 								histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack(0)->GetPointY(4) ,track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								histos->h_pos_diff_eta_out_in_vs_angle_cutangle->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3) );
+								histos->h_pos_eta_out_vs_eta_in_ontrack_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(3));
+								
+								histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(3), track->getAngle(0));
+							//	histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill( eta_out_corr, track->getAngle(0));
+								histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(4), track->getAngle(0));
+							//	histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill( eta_in_corr, track->getAngle(0));
+
+								histos->h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+						 		histos->h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+							//	histos->h_pos_diff_eta_out_in_vs_evtno_cutangle->Fill(iEvent, track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3) );
 							} 
 							if(track->acceptEtaOut() && track->acceptStereo() )
 							{
-								if(track->acceptEtaIn()) histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3));
-								else histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								float alpha_corr = struct_eta_stereo_out_angle.alpha_corr;
+								float beta_corr = struct_eta_stereo_out_angle.beta_corr;
+
+								histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), track->getAngle(0) );
+							//	histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, track->getAngle(0) );
+							//	histos->h_pos_stereo_vs_angle_cutangle_corr->Fill( eta_stereo_corr, track->getAngle(0));
+							//	histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill( eta_out_corr, track->getAngle(0));
+								
+								if(track->acceptEtaIn()) {
+								 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill( track->getTrack(0)->GetPointY(5) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)));
+								 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(0),track->getTrack(0)->GetPointY(5) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)));
+								 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3));
+								 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3));
+								 histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(5), track->getAngle(0));
+								 histos->h_pos_eta_in_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(4), track->getAngle(0));
+							//	 histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill( eta_in_corr, track->getAngle(0));
+								 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack(0)->GetPointY(5), track->getTrack(0)->GetPointY(3));
+
+								 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+						 		 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(5), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								// histos->h_pos_diff_eta_out_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(3));
+								}
+								else{
+								 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill(track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)));
+								 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(0),  track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)));
+								 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								 histos->h_pos_eta_out_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								 histos->h_pos_stereo_vs_angle_cutangle->Fill( track->getTrack(0)->GetPointY(4), track->getAngle(0));
+								 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(3));
+
+								 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+						 		 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								// histos->h_pos_diff_eta_out_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								}
 							}
 							if(track->acceptEtaIn() && track->acceptStereo() ) 
 							{
-								if(track->acceptEtaOut()) histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4));
-								else histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								float alpha_corr = struct_eta_stereo_in_angle.alpha_corr;
+								float beta_corr = struct_eta_stereo_in_angle.beta_corr;
+
+								histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), track->getAngle(0) );
+								//histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, track->getAngle(0) );
+								//histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill(eta_in_corr, track->getAngle(0));
+								if(track->acceptEtaOut()) {
+								 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(5) - (track->getTrack(0)->GetPointY(4) + alpha_corr + beta_corr*track->getAngle(0)));
+								 histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill( track->getTrack(0)->GetPointY(5) - (track->getTrack(0)->GetPointY(4) + alpha_corr + beta_corr*track->getAngle(0)) );
+								 histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4));
+								 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4));
+								 histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack(0)->GetPointY(5), track->getTrack(0)->GetPointY(4));
+								 histos->h_pos_eta_in_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getAngle(0));
+								 histos->h_pos_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(5), track->getAngle(0));
+								 histos->h_pos_eta_out_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								// histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill(eta_out_corr, track->getAngle(0));
+
+								 histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4), track->getAngle(0));
+						 		 histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(5), track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4), track->getAngle(0));
+								// histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(0)->GetPointY(5) - track->getTrack(0)->GetPointY(4));
+								}
+								else {
+									histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)));
+								    histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill( track->getTrack(0)->GetPointY(4) - (track->getTrack(0)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(0)) );
+									histos->h_pos_diff_eta_in_stereo_cutangle->Fill(track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								 	histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(track->getAngle(0), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								 	histos->h_pos_eta_in_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								 	histos->h_pos_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getAngle(0));
+									histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(3));
+
+									histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(3), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+						 		 	histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(0)->GetPointY(4), track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3), track->getAngle(0));
+								// 	histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(0)->GetPointY(4) - track->getTrack(0)->GetPointY(3));
+								}
 							}
 
 						}
@@ -1091,6 +1283,7 @@ int run(std::string run_number, std::string sector="C14")
 
 					TGraphAsymmErrors* gr_track_4points_IP1;
 					TGraphAsymmErrors* gr_track_4points_IP2;
+					TGraphAsymmErrors* gr_track_4points_stereo;
 					
 					if(track->etaOut_fired(index))
 					{
@@ -1113,6 +1306,18 @@ int run(std::string run_number, std::string sector="C14")
 							out_file->cd("track_candidates/inclusive/IP2-4points/track_displays");
 							gr_track_4points_IP2->SetTitle(Form("Event-%i",iEvent));
 							gr_track_4points_IP2->Write();
+						}	
+					}
+
+					if(track->stereo_fired(index))
+					{
+						gr_track_4points_stereo = track->track4points(index,-1);
+						gr_track_4points_stereo->SetName(Form("gr_track_4points_stereo_%i_%i",index,iEvent));
+						if(count_mult_track_events<101)
+						{
+							out_file->cd("track_candidates/inclusive/stereo-4points/track_displays");
+							gr_track_4points_stereo->SetTitle(Form("Event-%i",iEvent));
+							gr_track_4points_stereo->Write();
 						}	
 					}
 
@@ -1144,7 +1349,7 @@ int run(std::string run_number, std::string sector="C14")
 					{
 						float alpha_corr = 0;
 						float beta_corr = 1;
-						float beta = beta = 1/TMath::Sqrt(track->trackSlope(index)*track->trackSlope(index) + 1);
+						float beta = 1/TMath::Sqrt(track->trackSlope(index)*track->trackSlope(index) + 1);
 	
 						if(v_track_info_layer[index].at(i)==0)
 						{
@@ -1274,6 +1479,7 @@ int run(std::string run_number, std::string sector="C14")
 								{
 									histos->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
 									histos->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(distance_from_track, alpha_corr + beta_corr*v_track_info_ypos[index].at(i) );
+									histos->h_pos_stereo_vs_angle_cutangle_corrected->Fill( (alpha_corr+beta_corr*v_track_info_ypos[index].at(i)) , trangle );
 									count_SM1_stereo_angle++;
 									stereo_angle=true;
 								}
@@ -1288,9 +1494,26 @@ int run(std::string run_number, std::string sector="C14")
 					if(etaOut && etaIn) histos->h_pos_diff_eta_out_in->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3) );
 					if(etaOut_angle && etaIn_angle)
 					{
+						float alpha_corr = struct_eta_in_out_angle.alpha_corr;
+						float beta_corr = struct_eta_in_out_angle.beta_corr;
+
+						histos->h_pos_diff_eta_out_in_cutangle_corr->Fill( track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)) );
+						histos->h_pos_diff_eta_out_in_vs_angle_cutangle_corr->Fill(trangle, track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)) );
+
 						histos->h_pos_diff_eta_out_in_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3) );
 						histos->h_pos_diff_eta_out_in_vs_eta_out_cutangle->Fill(track->getTrack(index)->GetPointY(3) ,track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
 						histos->h_pos_diff_eta_out_in_vs_eta_in_cutangle->Fill(track->getTrack(index)->GetPointY(4) ,track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
+						histos->h_pos_eta_out_vs_eta_in_ontrack_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(3));
+						histos->h_pos_diff_eta_out_in_vs_angle_cutangle->Fill(trangle, track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3) );
+						
+						histos->h_pos_eta_out_vs_angle_cutangle->Fill( v_track_graphs.at(index)->GetPointY(3), trangle);
+						//histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill(eta_out_corr, trangle);
+						histos->h_pos_eta_in_vs_angle_cutangle->Fill( v_track_graphs.at(index)->GetPointY(4), trangle);
+						//histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill(eta_in_corr, trangle);
+
+						histos->h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(3), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						histos->h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						//histos->h_pos_diff_eta_out_in_vs_evtno_cutangle->Fill(iEvent, track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3) );
 					} 
 					if(etaOut && stereo)
 					{
@@ -1299,8 +1522,42 @@ int run(std::string run_number, std::string sector="C14")
 					}
 					if(etaOut_angle && stereo_angle)
 					{
-						if(etaIn_angle) histos->h_pos_diff_eta_out_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(3));
-						else histos->h_pos_diff_eta_out_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						float alpha_corr = struct_eta_stereo_out_angle.alpha_corr;
+						float beta_corr = struct_eta_stereo_out_angle.beta_corr;
+
+						histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), trangle );
+					//	histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, trangle );
+					//	histos->h_pos_stereo_vs_angle_cutangle_corr->Fill( eta_stereo_corr, trangle);
+					//	histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill(eta_out_corr, trangle);
+						if(etaIn_angle){
+						 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill( track->getTrack(index)->GetPointY(5) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(trangle,track->getTrack(index)->GetPointY(5) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)));
+						 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(3));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(trangle, track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(3));
+						 
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(3), trangle);
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5), trangle);
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4), trangle);
+					//	 histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill(eta_in_corr, trangle);
+						 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack(index)->GetPointY(5), track->getTrack(index)->GetPointY(3));
+
+						 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(3), track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(3), trangle);
+						 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(5), track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(3), trangle);
+						// histos->h_pos_diff_eta_out_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(3));
+						}
+						else {
+						 histos->h_pos_diff_eta_out_stereo_cutangle_corr->Fill( track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Fill(trangle,track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)));
+						 histos->h_pos_diff_eta_out_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						 histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Fill(trangle, track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill( v_track_graphs.at(index)->GetPointY(3), trangle);
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill( v_track_graphs.at(index)->GetPointY(4), trangle);
+						 histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(3));
+
+						 histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(3), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						 histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						// histos->h_pos_diff_eta_out_stereo_vs_evtno_cutangle->Fill(iEvent, track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3));
+						}
 					}
 					if(etaIn && stereo ) 
 					{
@@ -1309,8 +1566,40 @@ int run(std::string run_number, std::string sector="C14")
 					}
 					if(etaIn_angle && stereo_angle ) 
 					{
-						if(etaOut_angle) histos->h_pos_diff_eta_in_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(4));
-						else histos->h_pos_diff_eta_in_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						float alpha_corr = struct_eta_stereo_in_angle.alpha_corr;
+						float beta_corr = struct_eta_stereo_in_angle.beta_corr;
+
+						histos->h_pos_phi_vs_angle_cutangle->Fill( track->GetPhiComponent(0), trangle );
+					//	histos->h_pos_phi_vs_angle_cutangle_corr->Fill( phi_stereo_corr, trangle );
+					//	histos->h_pos_eta_in_vs_angle_cutangle_corr->Fill(eta_in_corr, trangle);
+						if(etaOut_angle) {
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(trangle,  track->getTrack(index)->GetPointY(5) - (v_track_graphs.at(index)->GetPointY(4) + alpha_corr + beta_corr*track->getAngle(index)) );
+						 histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill( track->getTrack(index)->GetPointY(5) - (v_track_graphs.at(index)->GetPointY(4) + alpha_corr + beta_corr*track->getAngle(index)) );
+						 histos->h_pos_diff_eta_in_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(4));
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(trangle, v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(4));
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4), trangle);
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(5), trangle);
+						 histos->h_pos_eta_out_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(3), trangle);
+					//	 histos->h_pos_eta_out_vs_angle_cutangle_corr->Fill(eta_out_corr, trangle);
+						 histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack(index)->GetPointY(5), track->getTrack(index)->GetPointY(4));
+
+						 histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(4), trangle);
+						 histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(5), track->getTrack(index)->GetPointY(5) - track->getTrack(index)->GetPointY(4), trangle);
+						// histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, v_track_graphs.at(index)->GetPointY(5) - v_track_graphs.at(index)->GetPointY(4));
+						}
+						else {
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Fill(trangle, track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)) );
+						 histos->h_pos_diff_eta_in_stereo_cutangle_corr->Fill(track->getTrack(index)->GetPointY(4) - (v_track_graphs.at(index)->GetPointY(3) + alpha_corr + beta_corr*track->getAngle(index)));
+						 histos->h_pos_diff_eta_in_stereo_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						 histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Fill(trangle, v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						 histos->h_pos_eta_in_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(3), trangle);
+						 histos->h_pos_stereo_vs_angle_cutangle->Fill(v_track_graphs.at(index)->GetPointY(4), trangle);
+						 histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(3));
+
+						 histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(3), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						 histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Fill(track->getTrack(index)->GetPointY(4), track->getTrack(index)->GetPointY(4) - track->getTrack(index)->GetPointY(3), trangle);
+						// histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Fill(iEvent, v_track_graphs.at(index)->GetPointY(4) - v_track_graphs.at(index)->GetPointY(3));
+						}
 					}
 
 					if(count_mult_track_events < 101 ) 
@@ -1475,6 +1764,40 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_d_track_sby1_anglecut->Write();
 	histos->h_d_track_sby2_anglecut->Write();
 	histos->h_d_track_sby3_anglecut->Write();
+	histos->h_pos_diff_eta_out_in_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle->Write();
+	histos->h_pos_eta_out_vs_angle_cutangle->Write();
+	histos->h_pos_eta_in_vs_angle_cutangle->Write();
+	histos->h_pos_stereo_vs_angle_cutangle->Write();
+	histos->h_pos_phi_vs_angle_cutangle->Write();
+	histos->h_pos_eta_out_vs_eta_in_ontrack_cutangle->Write();
+	histos->h_pos_eta_out_vs_stereo_ontrack_cutangle->Write();
+	histos->h_pos_eta_in_vs_stereo_ontrack_cutangle->Write();
+	histos->h_pos_diff_eta_out_in_cutangle_corr->Write();
+	histos->h_pos_diff_eta_out_stereo_cutangle_corr->Write();
+	histos->h_pos_diff_eta_in_stereo_cutangle_corr->Write();
+	histos->h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->Write();
+	histos->h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->Write();
+	
+
+	histos->h_pos_diff_eta_out_in_vs_angle_cutangle_corr->Write();
+	histos->h_pos_stereo_vs_angle_cutangle_corr->Write();
+	histos->h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->Write();
+	histos->h_pos_phi_vs_angle_cutangle_corr->Write();
+	histos->h_pos_eta_in_vs_angle_cutangle_corr->Write();
+	histos->h_pos_eta_out_vs_angle_cutangle_corr->Write();
+	histos->h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->Write();	
+
+	histos->h_pos_stereo_vs_angle_cutangle_corrected->Write();
+
+	//histos->h_pos_diff_eta_out_in_vs_evtno_cutangle->Write();
+	//histos->h_pos_diff_eta_out_stereo_vs_evtno_cutangle->Write();
+	//histos->h_pos_diff_eta_in_stereo_vs_evtno_cutangle->Write();
 
 	out_file->cd("track_candidates/inclusive/IP1-4points");
 	histos->h_chi2ndf_4points_IP1->Write();
@@ -1493,6 +1816,15 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_d_track_etain_4points->Write();
 	histos->h_d_track_etain_cut_4points->Write();
 	histos->h_d_track_etain_cut_anglecut_4points->Write();
+
+	out_file->cd("track_candidates/inclusive/stereo-4points");
+	histos->h_chi2ndf_4points_stereo->Write();
+	histos->h_chi2_4points_stereo->Write();
+	histos->h_angle_4points_stereo->Write();
+	histos->h_prob_4points_stereo->Write();
+	histos->h_d_track_stereo_4points->Write();
+	histos->h_d_track_stereo_cut_4points->Write();
+	histos->h_d_track_stereo_cut_anglecut_4points->Write();
 
 	out_file->cd("track_candidates");
 	histos->h_angle_only_scluster_sby2->Write();

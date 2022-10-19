@@ -1,6 +1,9 @@
 #ifndef TRACK_H
 #define TRACK_H
 
+// comment out -> not account the alignment on track 
+//#define DISABLE_ALIGNMENT_ON_TRACK
+
 #include "Cluster.h"
 #include "Histograms.h"
 #include "Cuts.h"
@@ -80,8 +83,12 @@ public:
 	inline TGraphAsymmErrors* track4points(int itrack, int ilayer); 
 	inline bool etaOut_fired(int itrack) {return m_etaOut_fired.at(itrack);};
 	inline bool etaIn_fired(int itrack) {return m_etaIn_fired.at(itrack);};
+	inline bool stereo_fired(int itrack) {return m_stereo_fired.at(itrack);};
 	inline void etaOut_fired() {m_etaOut_fired.push_back(false);};
 	inline void etaIn_fired() {m_etaIn_fired.push_back(false);};
+	inline void stereo_fired() {m_stereo_fired.push_back(false);};
+
+	inline float GetPhiComponent(int itrack) { return m_phi.at(itrack);};
 
 	// Functions to define the efficiency per MMFE8
 	inline float extrapolateTrackOnSM1(int itrack);
@@ -120,6 +127,7 @@ private:
 // flags for inclusive-exclusive method
 	std::vector<bool> m_etaOut_fired; 
 	std::vector<bool> m_etaIn_fired; 
+	std::vector<bool> m_stereo_fired; 
 // =====================================
 
 	bool m_accept_eta_out = false;
@@ -146,6 +154,7 @@ private:
 	std::vector<float> m_v_prob_tracks;
 	std::vector<float> m_v_track_sel_criterium;
 	std::vector<float> m_v_distances;
+	std::vector<float> m_phi;
 
 	std::map<float,float> m_map_z_y;
 	std::map<float,float> m_map_z_errory;
@@ -212,6 +221,10 @@ inline void Track::fillSM1events(int clus_index, Cluster* clus_lay, int layIndex
 	{
 	
 		beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
+
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
 		m_ipoint++;
 	
 		if(layIndex==0)
@@ -232,6 +245,10 @@ inline void Track::fillSM1events(int clus_index, Cluster* clus_lay, int layIndex
 	{
 		
 		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
+
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
 		if(getTrack(itrack)->GetN()<4) m_ipoint=2;
 		m_ipoint++;
 		
@@ -278,7 +295,7 @@ inline float Track::extrapolateTrackOnSM1(int itrack)
 	return expected_position_on_SM1;
 }
 
-inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
+inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer) // ilayer=0 ->eta_out, ilayer=1 ->eta_in, ilayer=-1 ->stereo
 {
 	gr_track_4points = new TGraphAsymmErrors();
 	gr_track_4points->GetXaxis()->SetTitle("z [mm]");
@@ -300,7 +317,7 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		gr_track_4points->SetPointError(1, gr_track->GetErrorXlow(1), gr_track->GetErrorXhigh(1), gr_track->GetErrorYlow(1), gr_track->GetErrorYhigh(1));
 		gr_track_4points->SetPointError(2, gr_track->GetErrorXlow(2), gr_track->GetErrorXhigh(2), gr_track->GetErrorYlow(2), gr_track->GetErrorYhigh(2));
 
-		if(gr_track->GetN()>3 )
+		if(gr_track->GetN()>3 && ilayer>=0)
 		{
 			if(check && m_etaOut_fired.at(itrack))
 			{
@@ -309,6 +326,27 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(4), gr_track->GetErrorXhigh(4), gr_track->GetErrorYlow(4), gr_track->GetErrorYhigh(4));
 			}
 			else
+			{
+				gr_track_4points->SetPointX(3, gr_track->GetPointX(3));
+				gr_track_4points->SetPointY(3, gr_track->GetPointY(3));
+				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(3), gr_track->GetErrorXhigh(3), gr_track->GetErrorYlow(3), gr_track->GetErrorYhigh(3));
+			}
+		}
+		else if(gr_track->GetN()>3 && ilayer<0)
+		{
+			if(m_etaIn_fired.at(itrack) && m_etaOut_fired.at(itrack))
+			{
+				gr_track_4points->SetPointX(3, gr_track->GetPointX(5));
+				gr_track_4points->SetPointY(3, gr_track->GetPointY(5));
+				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(5), gr_track->GetErrorXhigh(5), gr_track->GetErrorYlow(5), gr_track->GetErrorYhigh(5));
+			}
+			else if( (m_etaOut_fired.at(itrack) && !m_etaIn_fired.at(itrack)) || (m_etaIn_fired.at(itrack) && !m_etaOut_fired.at(itrack)) )
+			{
+				gr_track_4points->SetPointX(3, gr_track->GetPointX(4));
+				gr_track_4points->SetPointY(3, gr_track->GetPointY(4));
+				gr_track_4points->SetPointError(3, gr_track->GetErrorXlow(4), gr_track->GetErrorXhigh(4), gr_track->GetErrorYlow(4), gr_track->GetErrorYhigh(4));
+			}
+			else if ( !m_etaIn_fired.at(itrack) && !m_etaOut_fired.at(itrack) )
 			{
 				gr_track_4points->SetPointX(3, gr_track->GetPointX(3));
 				gr_track_4points->SetPointY(3, gr_track->GetPointY(3));
@@ -330,7 +368,7 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		gr_track_4points->SetPointY(1, getTrack(itrack)->GetPointY(1));
 		gr_track_4points->SetPointY(2, getTrack(itrack)->GetPointY(2));
 
-		if(getTrack(itrack)->GetN()>3)
+		if(getTrack(itrack)->GetN()>3 && ilayer>=0)
 		{
 			if(check && m_etaOut_fired.at(itrack))
 			{
@@ -344,7 +382,28 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(3));
 				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(3), getTrack(itrack)->GetErrorXhigh(3), getTrack(itrack)->GetErrorYlow(3), getTrack(itrack)->GetErrorYhigh(3));
 			}	
-		}
+		}		
+		if(getTrack(itrack)->GetN()>3 && ilayer==-1)
+		{
+			if(m_etaIn_fired.at(itrack) && m_etaOut_fired.at(itrack))
+			{
+				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(5));
+				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(5));
+				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(5), getTrack(itrack)->GetErrorXhigh(5), getTrack(itrack)->GetErrorYlow(5), getTrack(itrack)->GetErrorYhigh(5));
+			}
+			else if( (m_etaOut_fired.at(itrack) && !m_etaIn_fired.at(itrack)) || (m_etaIn_fired.at(itrack) && !m_etaOut_fired.at(itrack)) )
+			{
+				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(4));
+				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(4));
+				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(4), getTrack(itrack)->GetErrorXhigh(4), getTrack(itrack)->GetErrorYlow(4), getTrack(itrack)->GetErrorYhigh(4));
+			}
+			else if ( !m_etaIn_fired.at(itrack) && !m_etaOut_fired.at(itrack) )
+			{
+				gr_track_4points->SetPointX(3, getTrack(itrack)->GetPointX(3));
+				gr_track_4points->SetPointY(3, getTrack(itrack)->GetPointY(3));
+				gr_track_4points->SetPointError(3, getTrack(itrack)->GetErrorXlow(3), getTrack(itrack)->GetErrorXhigh(3), getTrack(itrack)->GetErrorYlow(3), getTrack(itrack)->GetErrorYhigh(3));
+			}
+		}		
 	}
 
 	TF1* f_track_4points = new TF1("f_track_4points", "[0] + [1]*x", 0, 3800);
@@ -389,13 +448,30 @@ inline TGraphAsymmErrors* Track::track4points(int itrack, int ilayer)
 		if(m_etaIn_fired.at(itrack) )
 		{
 			distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
-			//else distance_from_track = (slope*gr_track_4points->GetPointX(4) - gr_track_4points->GetPointY(4) + constant)/(TMath::Sqrt(slope*slope + 1));
-			//std::cout<<"itrack-"<<itrack<<" ilayer-"<<ilayer<<" D="<<distance_from_track<<" "<<m_etaOut_fired.at(itrack)<<std::endl;
 			histograms->h_d_track_etain_4points->Fill(distance_from_track);
 			if(distance_from_track<=eta_in_cut_eff_up && distance_from_track>=-eta_in_cut_eff_down)
 			{
 				histograms->h_d_track_etain_cut_4points->Fill(distance_from_track);
 				if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_etain_cut_anglecut_4points->Fill(distance_from_track);
+			}
+		}
+	}
+
+	if(ilayer==-1)
+	{
+		histograms->h_chi2ndf_4points_stereo->Fill(chi2/ndf);
+		histograms->h_chi2_4points_stereo->Fill(chi2);
+		histograms->h_angle_4points_stereo->Fill(m_angle);
+		histograms->h_prob_4points_stereo->Fill(prob);
+
+		if(m_stereo_fired.at(itrack) )
+		{
+			distance_from_track = (slope*gr_track_4points->GetPointX(3) - gr_track_4points->GetPointY(3) + constant)/(TMath::Sqrt(slope*slope + 1));
+			histograms->h_d_track_stereo_4points->Fill(distance_from_track);
+			if(distance_from_track<=stereo_cut_eff_up && distance_from_track>=-stereo_cut_eff_down)
+			{
+				histograms->h_d_track_stereo_cut_4points->Fill(distance_from_track);
+				if(angle>=-track_angle_cut_down && angle<=track_angle_cut_up) histograms->h_d_track_stereo_cut_anglecut_4points->Fill(distance_from_track);
 			}
 		}
 	}
@@ -436,23 +512,38 @@ inline void Track::fillStereoCluster(Cluster* clus_lay2, Cluster* clus_lay3, int
 	if(!m_many_sclusters)
 	{
 		beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
+
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
+
 		alpha_corr = struct_stereo.alpha_corr;
 		beta_corr = struct_stereo.beta_corr + beta;
 		gr_track->SetPointX(m_ipoint, (clus_lay2->getZPosition() + clus_lay3->getZPosition() )/2 );
 		float stereo_pos = (+0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)));
+		float stereo_phi = ( (-clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Sin(1.5*TMath::Pi()/180.));
 		gr_track->SetPointY(m_ipoint, alpha_corr + beta_corr*stereo_pos);
+		m_phi.push_back(stereo_phi);
 	}
 	else {
 		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
+
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
+
 		alpha_corr = struct_stereo.alpha_corr;
 		beta_corr = struct_stereo.beta_corr + beta;
 		getTrack(itrack)->SetPointX(m_ipoint, (clus_lay2->getZPosition() + clus_lay3->getZPosition() )/2 );
 		float stereo_pos = (+0.56 + ( (clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)));
+		float stereo_phi = ( (-clus_lay2->getCorrPosition(ind_cl2)+clus_lay3->getCorrPosition(ind_cl3)) / 2*TMath::Sin(1.5*TMath::Pi()/180.));
+		m_phi.push_back(stereo_phi);
 		getTrack(itrack)->SetPointY(m_ipoint, alpha_corr + beta_corr*stereo_pos);
 	}
 	m_map_point_charge[m_ipoint] = (clus_lay2->getTotPdo(ind_cl2)+clus_lay3->getTotPdo(ind_cl3));
 	m_totCharge += clus_lay2->getTotPdo(ind_cl2);
 	m_totCharge += clus_lay3->getTotPdo(ind_cl3);
+	m_stereo_fired.push_back(true);
 }
 
 inline void Track::setCriterium()
@@ -483,6 +574,10 @@ inline void Track::checkDistanceFromTrack(int itrack, int layer, Cluster* cluste
 		beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
 	}
 	
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
+
 	if(layer==0)
 	{
 		alpha_corr = struct_eta_out.alpha_corr;
@@ -606,6 +701,10 @@ inline void Track::checkStereoDistanceFromTrack(int itrack, float pos_stereo_y, 
 	if(!m_many_sclusters) beta = (1/TMath::Sqrt(m_slope*m_slope + 1));
 	else beta = 1/TMath::Sqrt(trackSlope(itrack)*trackSlope(itrack) + 1);
 	
+#if defined(DISABLE_ALIGNMENT_ON_TRACK) 
+		beta = 0;
+#endif
+
 	alpha_corr = struct_stereo.alpha_corr;
 	beta_corr = struct_stereo.beta_corr + beta;
 
@@ -622,12 +721,27 @@ inline void Track::checkStereoDistanceFromTrack(int itrack, float pos_stereo_y, 
 		m_isStereo = true;
 		if(!m_many_sclusters) {
 		 histograms->h_d_track_stereo_cut->Fill(distance_from_track);
-		 histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
+		 if((m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up))
+		 {
+		 	histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
+		 	histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
+		 	histograms->h_pos_stereo_vs_angle_cutangle_corrected->Fill( alpha_corr+beta_corr*pos_stereo_y, m_angle );
+		 }
+		//if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) 
+		//{
+		//	histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
+		//	histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
+		//}
 		}
-		if(!m_many_sclusters && (m_angle>=-track_angle_cut_down && m_angle<=track_angle_cut_up)) 
+		if((m_many_sclusters && m_mult_track_singles))
 		{
-			histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
-			histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
+			histograms->h_d_track_stereo_cut->Fill(distance_from_track);
+			if((getAngle(0)>=-track_angle_cut_down && getAngle(0)<=track_angle_cut_up))
+			{
+		 		histograms->h_d_track_stereo_cut_anglecut_vs_cl_pos->Fill(alpha_corr+beta_corr*pos_stereo_y, distance_from_track);
+		 		histograms->h_d_track_stereo_cut_anglecut->Fill(distance_from_track);
+		 		histograms->h_pos_stereo_vs_angle_cutangle_corrected->Fill( alpha_corr+beta_corr*pos_stereo_y, getAngle(0) );
+		 	}
 		}
 	}
 	else m_isStereo = false;

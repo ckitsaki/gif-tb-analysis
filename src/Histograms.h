@@ -134,6 +134,11 @@ public:
 	TH1F* h_chi2_4points_IP2;
 	TH1F* h_prob_4points_IP2;
 
+	TH1F* h_angle_4points_stereo;
+	TH1F* h_chi2ndf_4points_stereo;
+	TH1F* h_chi2_4points_stereo;
+	TH1F* h_prob_4points_stereo;
+
 	TH2F* h_sby1_minus_eta_out_vs_pos_eta_out;
 	TH2F* h_sby1_minus_pos_eta_in_vs_pos_eta_in;
 	TH2F* h_sby1_minus_stereo_vs_stereo;
@@ -194,6 +199,10 @@ public:
 	TH1F* h_d_track_etain_cut_4points;
 	TH1F* h_d_track_etain_cut_anglecut_4points;
 
+	TH1F* h_d_track_stereo_4points;
+	TH1F* h_d_track_stereo_cut_4points;
+	TH1F* h_d_track_stereo_cut_anglecut_4points;
+
 	TH2F* h_res_SBY2_SBY1_vs_SBY1;
 	TH2F* h_res_SBY3_SBY1_vs_SBY1;
 	TH2F* h_pos_etain_vs_pos_etaout;
@@ -207,12 +216,48 @@ public:
 	TH1F* h_pos_diff_eta_out_stereo_cutangle;
 	TH1F* h_pos_diff_eta_in_stereo_cutangle;
 
+	TH1F* h_pos_diff_eta_out_in_cutangle_corr;
+	TH1F* h_pos_diff_eta_out_stereo_cutangle_corr;
+	TH1F* h_pos_diff_eta_in_stereo_cutangle_corr;
+
+	TH2F* h_pos_diff_eta_out_in_vs_angle_cutangle;
+	TH2F* h_pos_diff_eta_out_in_vs_angle_cutangle_corr;
+	TH2F* h_pos_diff_eta_out_stereo_vs_angle_cutangle;
+	TH2F* h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr;
+	TH2F* h_pos_diff_eta_in_stereo_vs_angle_cutangle;
+	TH2F* h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr;
+
+	TH3F* h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle;
+	TH3F* h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle;
+	TH3F* h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle;
+	TH3F* h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle;
+	TH3F* h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle;
+	TH3F* h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle;
+
+	TH2F* h_pos_eta_out_vs_angle_cutangle;
+	TH2F* h_pos_eta_out_vs_angle_cutangle_corr;
+	TH2F* h_pos_stereo_vs_angle_cutangle;
+	TH2F* h_pos_stereo_vs_angle_cutangle_corr;
+	TH2F* h_pos_eta_in_vs_angle_cutangle;
+	TH2F* h_pos_eta_in_vs_angle_cutangle_corr;
+	TH2F* h_pos_phi_vs_angle_cutangle;
+	TH2F* h_pos_phi_vs_angle_cutangle_corr;
+
+	TH2F* h_pos_eta_out_vs_eta_in_ontrack_cutangle;
+	TH2F* h_pos_eta_out_vs_stereo_ontrack_cutangle;
+	TH2F* h_pos_eta_in_vs_stereo_ontrack_cutangle;
+	//TH2F* h_pos_diff_eta_out_in_vs_evtno_cutangle;
+	//TH2F* h_pos_diff_eta_out_stereo_vs_evtno_cutangle;
+	//TH2F* h_pos_diff_eta_in_stereo_vs_evtno_cutangle;
+
 	TH2F* h_pos_diff_eta_out_in_vs_eta_in_cutangle;
 	TH2F* h_pos_diff_eta_out_in_vs_eta_out_cutangle;
 
 	TH2F* h_d_track_etaout_cut_anglecut_vs_cl_pos;
 	TH2F* h_d_track_etain_cut_anglecut_vs_cl_pos;
 	TH2F* h_d_track_stereo_cut_anglecut_vs_cl_pos;
+
+	TH2F* h_pos_stereo_vs_angle_cutangle_corrected;
 
 	TH2F* h_align_etaout_ontrack;
 
@@ -246,6 +291,131 @@ inline void Histograms::init()
 	h_pos_diff_eta_out_in_cutangle = new TH1F("h_pos_diff_eta_out_in_cutangle", "eta_in - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_in_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
 
+	h_pos_diff_eta_out_in_cutangle_corr = new TH1F("h_pos_diff_eta_out_in_cutangle_corr", "eta_in - eta_out (corrected)" ,1000, -5, 5);
+	h_pos_diff_eta_out_in_cutangle_corr->GetXaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+
+	h_pos_diff_eta_out_in_vs_angle_cutangle = new TH2F("h_pos_diff_eta_out_in_vs_angle_cutangle", "eta_in - eta_out vs track angle" ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_out_in_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_angle_cutangle->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_in_vs_angle_cutangle_corr = new TH2F("h_pos_diff_eta_out_in_vs_angle_cutangle_corr", "eta_in - eta_out vs track angle" ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_out_in_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm] (corrected)");
+	h_pos_diff_eta_out_in_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle = new TH2F("h_pos_diff_eta_out_stereo_vs_angle_cutangle", "stereo - eta_out vs track angle" ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr = new TH2F("h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr", "stereo - eta_out vs track angle" ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm] (corrected)");
+	h_pos_diff_eta_out_stereo_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle = new TH2F("h_pos_diff_eta_in_stereo_vs_angle_cutangle", "stereo - eta_in vs track angle" ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle->GetXaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr = new TH2F("h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr", "stereo - eta_in vs track angle " ,1000, -1, 1, 5000, -5, 5);
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm] (corrected)");
+	h_pos_diff_eta_in_stereo_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#theta [deg]");
+
+
+	h_pos_eta_out_vs_angle_cutangle = new TH2F("h_pos_eta_out_vs_angle_cutangle", "eta_out vs track angle" , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_eta_out_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{out} [mm]");
+	h_pos_eta_out_vs_angle_cutangle->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_eta_out_vs_angle_cutangle_corr = new TH2F("h_pos_eta_out_vs_angle_cutangle_corr", "eta_out vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_eta_out_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#eta^{out} [mm] (corrected)");
+	h_pos_eta_out_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_eta_in_vs_angle_cutangle = new TH2F("h_pos_eta_in_vs_angle_cutangle", "eta_in vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_eta_in_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{in} [mm]");
+	h_pos_eta_in_vs_angle_cutangle->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_eta_in_vs_angle_cutangle_corr = new TH2F("h_pos_eta_in_vs_angle_cutangle_corr", "eta_in vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_eta_in_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#eta^{in} [mm] (corrected)");
+	h_pos_eta_in_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_stereo_vs_angle_cutangle = new TH2F("h_pos_stereo_vs_angle_cutangle", "stereo vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_stereo_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{stereo} [mm]");
+	h_pos_stereo_vs_angle_cutangle->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_stereo_vs_angle_cutangle_corrected = new TH2F("h_pos_stereo_vs_angle_cutangle_corrected", "stereo vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_stereo_vs_angle_cutangle_corrected->GetXaxis()->SetTitle("#eta^{stereo} [mm] (corrected)");
+	h_pos_stereo_vs_angle_cutangle_corrected->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_stereo_vs_angle_cutangle_corr = new TH2F("h_pos_stereo_vs_angle_cutangle_corr", "stereo vs track angle " , 600, 1300, 1900, 1000, -1, 1);
+	h_pos_stereo_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#eta^{stereo} [mm] (corrected)");
+	h_pos_stereo_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_phi_vs_angle_cutangle = new TH2F("h_pos_phi_vs_angle_cutangle", "phi vs track angle " , 4000, -.4, .4, 1000, -1, 1);
+	h_pos_phi_vs_angle_cutangle->GetXaxis()->SetTitle("#phi [mm]");
+	h_pos_phi_vs_angle_cutangle->GetYaxis()->SetTitle("#theta [deg]");
+
+	h_pos_phi_vs_angle_cutangle_corr = new TH2F("h_pos_phi_vs_angle_cutangle_corr", "phi vs track angle " , 100, -.4, .4, 1000, -1, 1);
+	h_pos_phi_vs_angle_cutangle_corr->GetXaxis()->SetTitle("#phi [mm] (corrected)");
+	h_pos_phi_vs_angle_cutangle_corr->GetYaxis()->SetTitle("#theta [deg]");
+
+//----->
+	h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle = new TH3F("h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle", "eta_in - eta_out vs eta_out vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{out} [mm]");
+	h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_out_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle = new TH3F("h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle", "eta_in - eta_out vs eta_in vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{in} [mm]");
+	h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_in_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle = new TH3F("h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle", "stereo - eta_out vs eta_out vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{out} [mm]");
+	h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_stereo_vs_out_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle = new TH3F("h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle", "stereo - eta_out vs stereo vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{stereo} [mm]");
+	h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_stereo_vs_stereo_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+	
+	h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle = new TH3F("h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle", "stereo - eta_in vs eta_in vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{in} [mm]");
+	h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
+	h_pos_diff_eta_in_stereo_vs_in_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+
+	h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle = new TH3F("h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle", "stereo - eta_in vs stereo vs track angle" , 600, 1300, 1900, 5000, -1., 1., 30, -.4, .4);
+	h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->GetXaxis()->SetTitle("#eta^{stereo} [mm]");
+	h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
+	h_pos_diff_eta_in_stereo_vs_stereo_vs_angle_cutangle->GetZaxis()->SetTitle("#theta [deg]");
+	
+//----->
+	h_pos_eta_out_vs_eta_in_ontrack_cutangle = new TH2F("h_pos_eta_out_vs_eta_in_ontrack_cutangle", "eta_out vs eta_in" ,600, 1300, 1900, 600, 1300, 1900);
+	h_pos_eta_out_vs_eta_in_ontrack_cutangle->GetYaxis()->SetTitle("#eta^{out} [mm]");
+	h_pos_eta_out_vs_eta_in_ontrack_cutangle->GetXaxis()->SetTitle("#eta^{in} [mm]");
+
+	h_pos_eta_out_vs_stereo_ontrack_cutangle = new TH2F("h_pos_eta_out_vs_stereo_ontrack_cutangle", "eta_out vs stereo" ,600, 1300, 1900, 600, 1300, 1900);
+	h_pos_eta_out_vs_stereo_ontrack_cutangle->GetYaxis()->SetTitle("#eta^{out} [mm]");
+	h_pos_eta_out_vs_stereo_ontrack_cutangle->GetXaxis()->SetTitle("#eta^{stereo} [mm]");
+
+	h_pos_eta_in_vs_stereo_ontrack_cutangle = new TH2F("h_pos_eta_in_vs_stereo_ontrack_cutangle", "eta_in vs stereo" ,600, 1300, 1900, 600, 1300, 1900);
+	h_pos_eta_in_vs_stereo_ontrack_cutangle->GetYaxis()->SetTitle("#eta^{in} [mm]");
+	h_pos_eta_in_vs_stereo_ontrack_cutangle->GetXaxis()->SetTitle("#eta^{stereo} [mm]");
+
+
+	////
+/*
+	h_pos_diff_eta_out_in_vs_evtno_cutangle = new TH2F("h_pos_diff_eta_out_in_vs_evtno_cutangle", "eta_in - eta_out vs evtno" ,310000, 0, 310000, 1000, -5, 5);
+	h_pos_diff_eta_out_in_vs_evtno_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_in_vs_evtno_cutangle->GetXaxis()->SetTitle("evtno");
+
+	h_pos_diff_eta_out_stereo_vs_evtno_cutangle = new TH2F("h_pos_diff_eta_out_stereo_vs_evtno_cutangle", "stereo - eta_out vs evtno" ,310000, 0, 310000, 1000, -5, 5);
+	h_pos_diff_eta_out_stereo_vs_evtno_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+	h_pos_diff_eta_out_stereo_vs_evtno_cutangle->GetXaxis()->SetTitle("evtno");
+
+	h_pos_diff_eta_in_stereo_vs_evtno_cutangle = new TH2F("h_pos_diff_eta_in_stereo_vs_evtno_cutangle", "stereo - eta_in vs evtno" ,310000, 0, 310000, 1000, -5, 5);
+	h_pos_diff_eta_in_stereo_vs_evtno_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
+	h_pos_diff_eta_in_stereo_vs_evtno_cutangle->GetXaxis()->SetTitle("evtno");
+*/
+	/////
+
 	h_pos_diff_eta_out_in_vs_eta_in_cutangle = new TH2F("h_pos_diff_eta_out_in_vs_eta_in_cutangle", "eta_in - eta_out" ,600, 1300, 1900 ,1000, -5, 5);
 	h_pos_diff_eta_out_in_vs_eta_in_cutangle->GetYaxis()->SetTitle("#Delta(#eta^{in}-#eta^{out}) [mm]");
 	h_pos_diff_eta_out_in_vs_eta_in_cutangle->GetXaxis()->SetTitle("IP2 cluster position [mm]");
@@ -256,9 +426,15 @@ inline void Histograms::init()
 	
 	h_pos_diff_eta_out_stereo_cutangle = new TH1F("h_pos_diff_eta_out_stereo_cutangle", "stereo - eta_out" ,1000, -5, 5);
 	h_pos_diff_eta_out_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
+
+	h_pos_diff_eta_out_stereo_cutangle_corr = new TH1F("h_pos_diff_eta_out_stereo_cutangle_corr", "stereo - eta_out (corrected)" ,1000, -5, 5);
+	h_pos_diff_eta_out_stereo_cutangle_corr->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{out}) [mm]");
 	
 	h_pos_diff_eta_in_stereo_cutangle = new TH1F("h_pos_diff_eta_in_stereo_cutangle", "stereo - eta_in" ,1000, -5, 5);
 	h_pos_diff_eta_in_stereo_cutangle->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
+
+	h_pos_diff_eta_in_stereo_cutangle_corr = new TH1F("h_pos_diff_eta_in_stereo_cutangle_corr", "stereo - eta_in (corrected)" ,1000, -5, 5);
+	h_pos_diff_eta_in_stereo_cutangle_corr->GetXaxis()->SetTitle("#Delta(#eta^{stereo}-#eta^{in}) [mm]");
 
 	h_d_track_etaout = new TH1F("h_d_track_etaout", "Distance from track - eta_out" ,1000, -10, 10);
 	h_d_track_etaout->GetXaxis()->SetTitle("distance [mm]");
@@ -307,6 +483,15 @@ inline void Histograms::init()
 
 	h_d_track_etain_cut_anglecut_4points = new TH1F("h_d_track_etain_cut_anglecut_4points", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_stereo_4points = new TH1F("h_d_track_stereo_4points", "Distance from track - stereo" ,1000, -10, 10);
+	h_d_track_stereo_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_stereo_cut_4points = new TH1F("h_d_track_stereo_cut_4points", "Distance from track - stereo" ,1000, -10, 10);
+	h_d_track_stereo_cut_4points->GetXaxis()->SetTitle("distance [mm]");
+
+	h_d_track_stereo_cut_anglecut_4points = new TH1F("h_d_track_stereo_cut_anglecut_4points", "Distance from track - stereo" ,1000, -10, 10);
+	h_d_track_stereo_cut_anglecut_4points->GetXaxis()->SetTitle("distance [mm]");
 
 	h_d_track_etain = new TH1F("h_d_track_etain", "Distance from track - eta_in" ,1000, -10, 10);
 	h_d_track_etain->GetXaxis()->SetTitle("distance [mm]");
@@ -392,6 +577,9 @@ inline void Histograms::init()
 	h_angle_4points_IP2 = new TH1F("h_angle_4points_IP2", "track angle", 5000, -50, 50);
 	h_angle_4points_IP2->GetXaxis()->SetTitle("#theta [deg]");
 
+	h_angle_4points_stereo = new TH1F("h_angle_4points_stereo", "track angle", 5000, -50, 50);
+	h_angle_4points_stereo->GetXaxis()->SetTitle("#theta [deg]");
+
 	h_angle_cut = new TH1F("h_angle_cut", "track angle", 5000, -50, 50);
 	h_angle_cut->GetXaxis()->SetTitle("#theta [deg]");
 
@@ -417,6 +605,10 @@ inline void Histograms::init()
 	h_chi2ndf_4points_IP2 = new TH1F("h_chi2ndf_4points_IP2", "chi2 / ndf", 150, 0, 15);
 	h_chi2_4points_IP2 = new TH1F("h_chi2_4points_IP2", "chi2", 100, 0, 100);
 	h_prob_4points_IP2 = new TH1F("h_prob_4points_IP2", "h_prob", 100, 0, 1);
+
+	h_chi2ndf_4points_stereo = new TH1F("h_chi2ndf_4points_stereo", "chi2 / ndf", 150, 0, 15);
+	h_chi2_4points_stereo = new TH1F("h_chi2_4points_stereo", "chi2", 100, 0, 100);
+	h_prob_4points_stereo = new TH1F("h_prob_4points_stereo", "h_prob", 100, 0, 1);
 
 	h_prob_mult_tracks = new TH1F("h_prob_mult_tracks", "h_prob_mult_tracks", 100, 0, 1);
 
