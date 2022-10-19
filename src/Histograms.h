@@ -3,63 +3,63 @@
 
 class Histograms{
 public:
-	TH1F* h_raw_hits[4];
+	TH1F* h_raw_hits[8];
 	TH1F* h_raw_hits_small[4];
 	TH1F* h_raw_hit_trigger;
 
-	TH1F* h_strip_index_SM1_cluster[4];
+	TH1F* h_strip_index_SM1_cluster[8];
 	TH1F* h_strip_index_SB_cluster[4];
-	TH1F* h_strip_index_SM1[4];
+	TH1F* h_strip_index_SM1[8];
 	TH1F* h_strip_index_SB[4];
 
 	TH1F* h_strip_2044_pdo_SB[4];
 	TH1F* h_strip_2044_pdo_SM1[4];
 	
-	TH1F* h_nclusters[4];
+	TH1F* h_nclusters[8];
 	TH1F* h_nclusters_small[4];
 	
-	TH1F* h_nstrips[4];
+	TH1F* h_nstrips[8];
 	TH1F* h_nstrips_small[4];
 
-	TH1F* h_cl_charge[4];
+	TH1F* h_cl_charge[8];
 	TH1F* h_cl_charge_small[4];
 
-	TH1F* h_cl_charge_leadCluster[4];
-	TH1F* h_cl_charge_leadCluster_maxstrip[4];
-	TH1F* h_maxstrip_pdo_allClus[4];
-	TH1F* h_strip_pdo_in_leadCluster[4];
+	TH1F* h_cl_charge_leadCluster[8];
+	TH1F* h_cl_charge_leadCluster_maxstrip[8];
+	TH1F* h_maxstrip_pdo_allClus[8];
+	TH1F* h_strip_pdo_in_leadCluster[8];
 
-	TH1F* h_strip_pdo_in_clus[4];
+	TH1F* h_strip_pdo_in_clus[8];
 	TH1F* h_strip_pdo_in_clus_small[4];
 
-	TH1F* h_strip_tdo_in_clus[4];
+	TH1F* h_strip_tdo_in_clus[8];
 	TH1F* h_strip_tdo_in_clus_small[4];
 
-	TH1F* h_strip_relbcid_in_clus[4];
+	TH1F* h_strip_relbcid_in_clus[8];
 	TH1F* h_strip_relbcid_in_clus_small[4];
 
-	TH1F* h_clus_positions[4];
+	TH1F* h_clus_positions[8];
 	TH1F* h_clus_positions_small[4];
 
-	TH1F* h_clus_positions_corr[4];
+	TH1F* h_clus_positions_corr[8];
 	TH1F* h_clus_positions_small_corr[4];
 
-	TH1F* h_clus_positions_corr_ontrack[4];
+	TH1F* h_clus_positions_corr_ontrack[8];
 	TH1F* h_clus_positions_small_corr_ontrack[4];
-	TH1F* h_clus_positions_stripIndex_corr_ontrack[4];
+	TH1F* h_clus_positions_stripIndex_corr_ontrack[8];
 
-	TH1F* h_strip_time_in_clus[4];
+	TH1F* h_strip_time_in_clus[8];
 	TH1F* h_strip_time_in_clus_small[4];
 
-	TH1F* h_strip_time_in_clus_earliest[4];
+	TH1F* h_strip_time_in_clus_earliest[8];
 	TH1F* h_strip_time_in_clus_earliest_small[4];
 
 	TH1F* h_nlayers_with_cluster;
 	TH1F* h_nlayers_mult_track_events;
 	TH1F* h_mult_track_angle;
-	TH1F* h_nclusters_per_layer_event[4];
-	TH1F* h_cl_charge_on_track[4];
-	TH1F* h_nstrips_on_track[4];
+	TH1F* h_nclusters_per_layer_event[8];
+	TH1F* h_cl_charge_on_track[8];
+	TH1F* h_nstrips_on_track[8];
 
 	TH1F* h_time_res_SB01;
 	TH1F* h_time_res_SB1SM1lay0;
@@ -69,34 +69,34 @@ public:
 	TH1F* h_time_res_SB12;
 	TH1F* h_time_res_SB13;
 	
-	TH1F* h_strip_tdo[4][8192];
+	TH1F* h_strip_tdo[8][8192];
 	TH1F* h_strip_tdo_small[4][8192];
 	
-	TH2F* h_raw_hits_vs_tot_strips[4];
+	TH2F* h_raw_hits_vs_tot_strips[8];
 	TH2F* h_raw_hits_vs_tot_strips_small[4];
 
-	TH2F* h_cl_size_vs_cl_charge[4];
+	TH2F* h_cl_size_vs_cl_charge[8];
 	TH2F* h_cl_size_vs_cl_charge_small[4];
 	
-	TH2F* h_strip_index_vs_pdo[4];
+	TH2F* h_strip_index_vs_pdo[8];
 	TH2F* h_strip_index_vs_pdo_small[4];
 
-	TH2F* h_strip_index_vs_pdo0[4];
+	TH2F* h_strip_index_vs_pdo0[8];
 	TH2F* h_strip_index_vs_pdo0_small[4];
 	TH2F* h_strip_index_vs_pdo0_trigger;
 
-	TH2F* h_tdo_vs_pdo[4];
+	TH2F* h_tdo_vs_pdo[8];
 	TH2F* h_tdo_vs_pdo_small[4];
 
-	TH2F* h_strip_index_vs_tdo[4];
+	TH2F* h_strip_index_vs_tdo[8];
 	TH2F* h_strip_index_vs_tdo_small[4];
 	TH2F* h_strip_index_vs_tdo_trigger;
 
-	TH2F* h_strip_index_vs_relbcid[4];
+	TH2F* h_strip_index_vs_relbcid[8];
 	TH2F* h_strip_index_vs_relbcid_small[4];
 	TH2F* h_strip_index_vs_relbcid_trigger;
 
-	TH2F* h_strip_index_vs_bcid[4];
+	TH2F* h_strip_index_vs_bcid[8];
 	TH2F* h_strip_index_vs_bcid_small[4];
 	TH2F* h_strip_index_vs_bcid_trigger;
 
@@ -720,124 +720,125 @@ inline void Histograms::init()
 // end alignment
 
 	std::string type = "X";
-	for(int ilayer = 0; ilayer<4; ilayer++) {
+	for(int ilayer = 0; ilayer<8; ilayer++) {
 		if(ilayer>0) type = "Y";
 
 		h_strip_2044_pdo_SM1[ilayer] = new TH1F(Form("h_strip_2044_pdo_SM1_%i",ilayer), Form("SM1 Layer - %i (tot clus PDO=2044)",ilayer), 5120, 0, 5119);
 		h_strip_2044_pdo_SM1[ilayer]->GetXaxis()->SetTitle("strip index");
 
+if(ilayer<4) {
 		h_strip_2044_pdo_SB[ilayer] = new TH1F(Form("h_strip_2044_pdo_SB_%i",ilayer), Form("SB Layer - %i (tot clus PDO=2044)",ilayer), 5120, 0, 5119);
 		h_strip_2044_pdo_SB[ilayer]->GetXaxis()->SetTitle("strip index");
-
+}
 		h_strip_index_SM1[ilayer] = new TH1F(Form("h_strip_index_SM1_%i",ilayer), Form("SM1 Layer - %i",ilayer), 5120, 0, 5119);
 		h_strip_index_SM1[ilayer]->GetXaxis()->SetTitle("strip index");
-
+if(ilayer<4) {
 		h_strip_index_SB[ilayer] = new TH1F(Form("h_strip_index_SB_%i",ilayer), Form("SB Layer - %i",ilayer), 5120, 0, 5119);
 		h_strip_index_SB[ilayer]->GetXaxis()->SetTitle("strip index");
-
+}
 		h_strip_index_SM1_cluster[ilayer] = new TH1F(Form("h_strip_index_SM1_cluster_%i",ilayer), Form("SM1 Layer - %i: strips fired after clustering",ilayer), 5120, 0, 5119);
 		h_strip_index_SM1_cluster[ilayer]->GetXaxis()->SetTitle("strip index");
-
+if(ilayer<4) {
 		h_strip_index_SB_cluster[ilayer] = new TH1F(Form("h_strip_index_SB_cluster_%i",ilayer), Form("SB Layer - %i: strips fired after clustering",ilayer), 5120, 0, 5119);
 		h_strip_index_SB_cluster[ilayer]->GetXaxis()->SetTitle("strip index");
-
+}
 		h_raw_hits[ilayer] = new TH1F(Form("h_nhits_lay_SM1_%i",ilayer), Form("SM1 Layer - %i",ilayer), 100, 0, 300);
 		h_raw_hits[ilayer]->GetXaxis()->SetTitle("nhits");
-
+if(ilayer<4) {
 		h_raw_hits_small[ilayer] = new TH1F(Form("h_nhits_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 100, 0, 300);
 		h_raw_hits_small[ilayer]->GetXaxis()->SetTitle("nhits");
-
+}
 		h_nclusters[ilayer] = new TH1F(Form("h_nclusters_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 40, 0, 40);
 		h_nclusters[ilayer]->GetXaxis()->SetTitle("Nclusters");
-
+if(ilayer<4) {
 		h_nclusters_small[ilayer] = new TH1F(Form("h_nclusters_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 40, 0, 40);
 		h_nclusters_small[ilayer]->GetXaxis()->SetTitle("Nclusters");
-
+}
 		h_nstrips[ilayer] = new TH1F(Form("h_nstrips_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 40, 0, 40);
 		h_nstrips[ilayer]->GetXaxis()->SetTitle("Nstrips");
 
 		h_nstrips_on_track[ilayer] = new TH1F(Form("h_nstrips_SM1_ontrack_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 40, 0, 40);
 		h_nstrips_on_track[ilayer]->GetXaxis()->SetTitle("Nstrips");
-
+if(ilayer<4) {
 		h_nstrips_small[ilayer] = new TH1F(Form("h_nstrips_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 40, 0, 40);
 		h_nstrips_small[ilayer]->GetXaxis()->SetTitle("Nstrips");
-
+}
 		h_strip_time_in_clus[ilayer] = new TH1F(Form("h_strip_time_in_clus_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 100, 0, 200);
 		h_strip_time_in_clus[ilayer]->GetXaxis()->SetTitle("time [ns]");
 
 		h_strip_time_in_clus_earliest[ilayer] = new TH1F(Form("h_strip_earliest_time_in_clus_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 100, 0, 200);
 		h_strip_time_in_clus_earliest[ilayer]->GetXaxis()->SetTitle("time [ns]");
-
+if(ilayer<4) {
 		h_strip_time_in_clus_small[ilayer] = new TH1F(Form("h_strip_time_in_clus_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 100, 0, 200);
 		h_strip_time_in_clus_small[ilayer]->GetXaxis()->SetTitle("time [ns]");
 
 		h_strip_time_in_clus_earliest_small[ilayer] = new TH1F(Form("h_strip_earliest_time_in_clus_small_lay_%i",ilayer),  Form("SB%s  - %i",type.c_str(),ilayer), 100, 0, 200);
 		h_strip_time_in_clus_earliest_small[ilayer]->GetXaxis()->SetTitle("time [ns]");
-
+}
 		h_strip_pdo_in_clus[ilayer] = new TH1F(Form("h_strip_pdo_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 1024, 0, 1024);
 		h_strip_pdo_in_clus[ilayer]->GetXaxis()->SetTitle("strip pdo [adc counts]");
-
+if(ilayer<4) {
 		h_strip_pdo_in_clus_small[ilayer] = new TH1F(Form("h_strip_pdo_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 1024, 0, 1024);
 		h_strip_pdo_in_clus_small[ilayer]->GetXaxis()->SetTitle("strip pdo [adc counts]");
-
+}
 		h_strip_index_vs_pdo[ilayer] = new TH2F(Form("h_strip_index_vs_pdo_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 8192, 0, 8192, 1024, 0, 1024);
 		h_strip_index_vs_pdo[ilayer]->GetXaxis()->SetTitle("strip index");
 		h_strip_index_vs_pdo[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+if(ilayer<4) {
 		h_strip_index_vs_pdo_small[ilayer] = new TH2F(Form("h_strip_index_vs_pdo_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8192, 0, 8192, 1024, 0, 1024);
 		h_strip_index_vs_pdo_small[ilayer]->GetXaxis()->SetTitle("strip index");
 		h_strip_index_vs_pdo_small[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+}
 		h_strip_index_vs_pdo0[ilayer] =  new TH2F(Form("h_strip_index_vs_pdo0_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 8192, 0, 8192, 1024, 0, 1024);
 		h_strip_index_vs_pdo0[ilayer]->GetXaxis()->SetTitle("strip index");
 		h_strip_index_vs_pdo0[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+if(ilayer<4) {
 		h_strip_index_vs_pdo0_small[ilayer] =  new TH2F(Form("h_strip_index_vs_pdo0_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8192, 0, 8192, 1024, 0, 1024);
 		h_strip_index_vs_pdo0_small[ilayer]->GetXaxis()->SetTitle("strip index");
 		h_strip_index_vs_pdo0_small[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+}
 		h_tdo_vs_pdo[ilayer] = new TH2F(Form("h_tdo_vs_pdo_SM1_lay_%i",ilayer), Form("SM1 Layer - %i",ilayer), 256, 0, 256, 1024, 0, 1024);
 		h_tdo_vs_pdo[ilayer]->GetXaxis()->SetTitle("strip tdo [adc counts]");
 		h_tdo_vs_pdo[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+if(ilayer<4) {
 		h_tdo_vs_pdo_small[ilayer] = new TH2F(Form("h_tdo_vs_pdo_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 256, 0, 256, 1024, 0, 1024);
 		h_tdo_vs_pdo_small[ilayer]->GetXaxis()->SetTitle("strip tdo [adc counts]");
 		h_tdo_vs_pdo_small[ilayer]->GetYaxis()->SetTitle("strip pdo [adc counts]");
-
+}
 		h_strip_index_vs_tdo[ilayer] = new TH2F(Form("h_strip_index_vs_tdo_SM1_lay%i",ilayer), Form("SM1 Layer - %i",ilayer), 8192, 0, 8192, 256, 0, 256);
 		h_strip_index_vs_relbcid[ilayer] = new TH2F(Form("h_strip_index_vs_relbcid_SM1_lay%i",ilayer), Form("SM1 Layer - %i",ilayer), 8192, 0, 8192, 8, -0.5, 7.5);
 		h_strip_index_vs_bcid[ilayer] = new TH2F(Form("h_strip_index_vs_bcid_SM1_lay%i",ilayer), Form("SM1 Layer - %i",ilayer), 8192, 0, 8192, 3564, 0, 3564);
-
+if(ilayer<4) {
 		h_strip_index_vs_tdo_small[ilayer] = new TH2F(Form("h_strip_index_vs_tdo_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8192, 0, 8192, 256, 0, 256);
 		h_strip_index_vs_relbcid_small[ilayer] = new TH2F(Form("h_strip_index_vs_relbcid_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8192, 0, 8192, 8, -0.5, 7.5);
 		h_strip_index_vs_bcid_small[ilayer] = new TH2F(Form("h_strip_index_vs_bcid_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8192, 0, 8192, 3564, 0, 3564);
-
+}
 		h_strip_relbcid_in_clus[ilayer] = new TH1F(Form("h_strip_relbcid_lay_SM1_%i",ilayer), Form("SM1 Layer - %i",ilayer), 8, -0.5, 7.5);
 		h_strip_relbcid_in_clus[ilayer]->GetXaxis()->SetTitle("relative BCID");
 		h_strip_tdo_in_clus[ilayer] = new TH1F(Form("h_strip_tdo_lay_SM1_%i",ilayer), Form("SM1 Layer - %i",ilayer),85,0,255);
 		h_strip_tdo_in_clus[ilayer]->GetXaxis()->SetTitle("strip tdo");
-
+if(ilayer<4) {
 		h_strip_relbcid_in_clus_small[ilayer] = new TH1F(Form("h_strip_relbcid_lay_small_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer), 8, -0.5, 7.5);
 		h_strip_relbcid_in_clus_small[ilayer]->GetXaxis()->SetTitle("relative BCID");
 		h_strip_tdo_in_clus_small[ilayer] = new TH1F(Form("h_strip_tdo_lay_small_%i",ilayer), Form("SB%s  - %i",type.c_str(),ilayer),85,0,255);
 		h_strip_tdo_in_clus_small[ilayer]->GetXaxis()->SetTitle("strip tdo");
-
+}
 		h_raw_hits_vs_tot_strips[ilayer] = new TH2F(Form("h_raw_hits_vs_tot_strips_SM1_lay_%i",ilayer), Form("SM1 Layer - %i", ilayer), 40, 0, 40, 15, 0, 50);
 		h_raw_hits_vs_tot_strips[ilayer]->GetYaxis()->SetTitle("Nhits");
 		h_raw_hits_vs_tot_strips[ilayer]->GetXaxis()->SetTitle("Nstrips (all clusters)");
-
+if(ilayer<4) {
 		h_raw_hits_vs_tot_strips_small[ilayer] = new TH2F(Form("h_raw_hits_vs_tot_strips_small_lay_%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer), 40, 0, 40, 15, 0, 50);
 		h_raw_hits_vs_tot_strips_small[ilayer]->GetYaxis()->SetTitle("Nhits");
 		h_raw_hits_vs_tot_strips_small[ilayer]->GetXaxis()->SetTitle("Nstrips (all clusters)");
-
+}
 		h_cl_size_vs_cl_charge[ilayer] = new TH2F(Form("h_cl_size_vs_cl_charge_SM1_lay_%i",ilayer), Form("SM1 Layer - %i", ilayer), 40, 0, 40, 100024, 0, 100024);
 		h_cl_size_vs_cl_charge[ilayer]->GetYaxis()->SetTitle("cluster pdo [adc counts]");
 		h_cl_size_vs_cl_charge[ilayer]->GetXaxis()->SetTitle("Nstrips (each cluster)");
-
+if(ilayer<4) {
 		h_cl_size_vs_cl_charge_small[ilayer] = new TH2F(Form("h_cl_size_vs_cl_charge_lay_small_%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer), 40, 0, 40, 100024, 0, 100024);
 		h_cl_size_vs_cl_charge_small[ilayer]->GetYaxis()->SetTitle("cluster pdo [adc counts]");
 		h_cl_size_vs_cl_charge_small[ilayer]->GetXaxis()->SetTitle("Nstrips (each cluster)");
-
+}
 		h_cl_charge[ilayer] = new TH1F(Form("h_cl_charge_SM1_lay%i",ilayer), Form("SM1 Layer - %i", ilayer), 100024, 0, 100024);
 		h_cl_charge[ilayer]->GetXaxis()->SetTitle("cluster pdo [adc counts]");
 
@@ -860,20 +861,20 @@ inline void Histograms::init()
 		h_cl_charge_small[ilayer]->GetXaxis()->SetTitle("cluster pdo [adc counts]");
 
 		h_clus_positions[ilayer] = new TH1F(Form("h_clus_position_SM1_lay%i",ilayer), Form("SM1 Layer - %i", ilayer) ,7000, 0, 7000);
-		h_clus_positions_small[ilayer] = new TH1F(Form("h_clus_position_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer) ,7000, 0, 7000);
+if(ilayer<4) h_clus_positions_small[ilayer] = new TH1F(Form("h_clus_position_small_lay%i",ilayer), Form("SB%s  - %i",type.c_str(), ilayer) ,7000, 0, 7000);
 		
 		h_clus_positions_corr[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,700, 1300, 2000);
-		h_clus_positions_small_corr[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
+if(ilayer<4) h_clus_positions_small_corr[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
 
 		h_clus_positions_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_SM1_lay_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,700, 1300, 2000);
-		h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
+if(ilayer<4) h_clus_positions_small_corr_ontrack[ilayer] = new TH1F(Form("h_clus_position_small_lay_corr_ontrack%i",ilayer), Form("SB%s  - %i (corrected)",type.c_str(), ilayer) ,700, 1300, 2000);
 		h_clus_positions_stripIndex_corr_ontrack[ilayer] = new TH1F(Form("h_clus_positions_stripIndex_corr_ontrack%i",ilayer), Form("SM1 Layer - %i (corrected)", ilayer) ,3072, 0, 3072);
 
 		h_nclusters_per_layer_event[ilayer] = new TH1F(Form("h_nclusters_per_layer_event_%i",ilayer), Form("SM1 Layer - %i", ilayer) ,40, 0, 40);
 		
 		for(int istrip=0; istrip<8192; istrip++){
 			h_strip_tdo[ilayer][istrip] = new TH1F(Form("h_strip_%i_tdo_SM1_lay%i",istrip,ilayer), Form("SM1 strip - %i",istrip),85,0,255);
-			h_strip_tdo_small[ilayer][istrip] = new TH1F(Form("h_strip_%i_tdo_small_lay%i",istrip,ilayer), Form("SB strip - %i",istrip),85,0,255);
+			if(ilayer<4) h_strip_tdo_small[ilayer][istrip] = new TH1F(Form("h_strip_%i_tdo_small_lay%i",istrip,ilayer), Form("SB strip - %i",istrip),85,0,255);
 		}
 	}
 

@@ -3,7 +3,7 @@
 
 class Layer{
 public:
-	Layer(int layerIndex, bool isSM1/*, std::vector<int> v_hot*/); //constructor
+	Layer(int layerIndex, bool isSM1, bool isLM2/*, std::vector<int> v_hot*/); //constructor
 	virtual ~Layer()=default; // destructor 
 	inline void setLayerIndex(int layerIndex) { m_layerIndex = layerIndex;};
 	inline int getLayerIndex() { return m_layerIndex;};
@@ -20,6 +20,7 @@ public:
 	inline int getHitIndex(int strip) { return map_fired_strips_to_indices.find(strip)->second;};
 	inline void isTrigger(){m_isTrigger=true;};
 	inline bool isSM1(){return m_isSM1;};
+	inline bool isLM2(){return m_isLM2;};
 	inline void setAlphaBeta(float alpha, float beta) { m_alpha = alpha; m_beta = beta;};
 	inline float getAlpha() {return m_alpha;};
 	inline float getBeta() {return m_beta;};
@@ -33,17 +34,19 @@ private:
 
 	//std::vector<int> m_v_strips_to_reject;
 	bool m_isSM1 = false;
+	bool m_isLM2 = false;
 	bool m_isTrigger = false;
 	int m_layerIndex;
 	float m_alpha;
 	float m_beta;
 };
 
-inline Layer::Layer(int layerIndex, bool isSM1 /*, std::vector<int> v_hot*/)
+inline Layer::Layer(int layerIndex, bool isSM1, bool isLM2 /*, std::vector<int> v_hot*/)
 {
 	setLayerIndex(layerIndex);
 	//addStripsToReject(v_hot);
 	m_isSM1 = isSM1;
+	m_isLM2 = isLM2;
 	map_fired_strips_to_indices = map<int,int>();
 }
 
@@ -52,18 +55,24 @@ inline float Layer::convertLayerToGlobalZ() // return center of drift gaps
 	float lever_arm_0 = 2153.;
 	float lever_arm_1 = 790.;
 	float SM1_width = 78.;
-	if(!m_isSM1) 
+	if(!m_isSM1 && !m_isLM2)  // Small chambers
 	{
 		if(m_layerIndex==0) return 0; 
 		if(m_layerIndex==1) return 262;
 		if(m_layerIndex==2) return 262+lever_arm_0+SM1_width+lever_arm_1;
 		if(m_layerIndex==3) return 262+lever_arm_0+SM1_width+lever_arm_1+136;
 	}
-	else{
+	else if(m_isSM1) {
 	if(m_layerIndex==0) return lever_arm_0+262+13.835;
 	if(m_layerIndex==1) return lever_arm_0+262+30.615;
 	if(m_layerIndex==2) return lever_arm_0+262+46.985;
 	if(m_layerIndex==3) return lever_arm_0+262+63.765;
+	}
+	else if(m_isLM2) {
+		if(m_layerIndex==0) return lever_arm_0+262+13.835;
+		if(m_layerIndex==1) return lever_arm_0+262+30.615;
+		if(m_layerIndex==2) return lever_arm_0+262+46.985;
+		if(m_layerIndex==3) return lever_arm_0+262+63.765;
 	}
 
 	return 0;
@@ -72,51 +81,103 @@ inline float Layer::convertLayerToGlobalZ() // return center of drift gaps
 inline float Layer::convertStripToGlobalY_radius(int strip, int radius) 
 {
 
-	if(radius==4) {
-	if(m_layerIndex==0) //eta layers
+	if(m_isSM1)
 	{
+		if(radius==4) {
+		if(m_layerIndex==0) //eta layers
+		{
 		// SM1
-		return 895+35.3+(strip)*0.425; 
+			return 895+35.3+(strip)*0.425; 
 
-	}
-	else if(m_layerIndex==1)
-	{
+		}
+		else if(m_layerIndex==1)
+		{
 		// SM1
-		return 895+35.3+(strip)*0.425; 
-	}
-	else if(m_layerIndex==2) //stereo layers
-	{
+			return 895+35.3+(strip)*0.425; 
+		}
+		else if(m_layerIndex==2) //stereo layers
+		{
+			// SM1
+			return 895+35.3+(strip)*0.425; 
+		}
+		else if(m_layerIndex==3) //stereo layers
+		{
+			return 895+35.3+(strip)*0.425;
+		}
+		} //end radius 4
+		else if(radius==5) {
+			if(m_layerIndex==0 ) //eta layers
+		{
 		// SM1
-		return 895+35.3+(strip)*0.425; 
-	}
-	else if(m_layerIndex==3) //stereo layers
-	{
-		return 895+35.3+(strip)*0.425;
-	}
-	} //end radius 4
-	else if(radius==5) {
-		if(m_layerIndex==0 ) //eta layers
-	{
-		// SM1
-		return 895+35.3+(strip)*0.425; 
-	}
-	else if(m_layerIndex==1)
-	{
-		// SM1
-		return 895+35.3+(strip+1)*0.425; 
-	}
+			return 895+35.3+(strip)*0.425; 
+		}
+		else if(m_layerIndex==1)
+		{
+			// SM1
+			return 895+35.3+(strip)*0.425; 
+		}
 
-	if(m_layerIndex==2 ) //stereo layers
-	{
-		return 895+35.3+(strip-1)*0.425;
-	}
-	else if (m_layerIndex==3)
-	{
-		if(strip >= 2560 && strip <=2663) return 895+35.3+(strip+1)*0.425;
-		return 895+35.3+(strip)*0.425;
-	}
+		if(m_layerIndex==2 ) //stereo layers
+		{
+			return 895+35.3+(strip)*0.425;
+		}
+		else if (m_layerIndex==3)
+		{
+			if(strip >= 2560 && strip <=2663) return 895+35.3+(strip)*0.425;
+			return 895+35.3+(strip)*0.425;
+		}
 	
-	}//end radius 5
+		}//end radius 5
+	}
+
+	if(m_isLM2)
+	{
+		if(radius==4) {
+		if(m_layerIndex==0) //eta layers
+		{
+		// SM1
+			return 895+35.3+(strip)*0.45; 
+
+		}
+		else if(m_layerIndex==1)
+		{
+		// SM1
+			return 895+35.3+(strip)*0.45; 
+		}
+		else if(m_layerIndex==2) //stereo layers
+		{
+			// SM1
+			return 895+35.3+(strip)*0.45; 
+		}
+		else if(m_layerIndex==3) //stereo layers
+		{
+			return 895+35.3+(strip)*0.45;
+		}
+		} //end radius 4
+		else if(radius==5) {
+			if(m_layerIndex==0 ) //eta layers
+		{
+		// SM1
+			return 895+35.3+(strip)*0.45; 
+		}
+		else if(m_layerIndex==1)
+		{
+			// SM1
+			return 895+35.3+(strip)*0.45; 
+		}
+
+		if(m_layerIndex==2 ) //stereo layers
+		{
+			return 895+35.3+(strip)*0.45;
+		}
+		else if (m_layerIndex==3)
+		{
+			if(strip >= 2560 && strip <=2663) return 895+35.3+(strip)*0.45;
+			return 895+35.3+(strip)*0.45;
+		}
+	
+		}//end radius 5
+	}
 	return 0;
 
 }
@@ -192,10 +253,11 @@ if(m_isSM1)
 {
 	return (895+35.3+(strip)*0.425);
 }
+else if(m_isLM2) return (895+35.3+(strip)*0.45);
 
 // SB
 /////////////////
-else {
+else if(!m_isSM1 && !m_isLM2){
 	if(strip<1536) return (895+35.3+(std::abs(1535-strip)+1024)*0.45);
 	else return (895+35.3+(strip)*0.45); 
 }
@@ -235,7 +297,7 @@ inline void Layer::bookFiredStrips(std::vector<int> *strips, std::vector<unsigne
 	{
 		int index = m_v_hit_indices.at(ind);
 	//	if(std::find(m_v_strips_to_reject.begin(), m_v_strips_to_reject.end(), strips->at(index)) != m_v_strips_to_reject.end()) continue;
-		if(isDisconnectedStrip(strips->at(index))) continue;
+		//if(isDisconnectedStrip(strips->at(index))) continue;
 		//if(!m_isSM1 && m_layerIndex==0 && isDisconnectedStrip(strips->at(index))) continue;
 		if(pdo->at(index) > 64 )  // cut on PDO
 		{

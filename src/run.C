@@ -57,7 +57,7 @@ int run(std::string run_number, std::string sector="C14")
 	
 	gROOT->cd();
 
-	std::string filename = "/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUL2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUN2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
+	std::string filename = "data_test.1666198279._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.wr.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUL2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUN2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
 
 	TreeReader* treeReader = new TreeReader(filename.c_str(),"nsw");
 	std::cout<<"got the tree\n";
@@ -67,7 +67,7 @@ int run(std::string run_number, std::string sector="C14")
 	
 	Histograms* histos = new Histograms();
 
-	int single_strip_counter[4]={0, 0, 0, 0};
+	int single_strip_counter[8]={0, 0, 0, 0};
 	int single_strip_counter_small[4]={0, 0, 0, 0};
 	
 // Counters
@@ -145,20 +145,28 @@ int run(std::string run_number, std::string sector="C14")
 		counter0++; // total events
 
 		int nlay_clus = 0;
-		Layer* layer[4];
+		Layer* layer[8];
 		Layer* l_small[4];
-		Layer* trigger = new Layer(3, true);
+		Layer* trigger = new Layer(3, true, false);
 		trigger->isTrigger();
 
 		for(int iLayer = 0; iLayer<sizeof(layer)/sizeof(layer[0]); iLayer++){
-			layer[iLayer] = new Layer(iLayer, true);
-			l_small[iLayer] = new Layer(iLayer, false);
+			if(iLayer<4)
+				layer[iLayer] = new Layer(iLayer, false, true);
+			else layer[iLayer] = new Layer(iLayer, true, false);
+			
+			if(iLayer<4)
+				l_small[iLayer] = new Layer(iLayer, false, false);
 		}
 
 		layer[0]->setAlphaBeta(0, 1);
 		layer[1]->setAlphaBeta(0, 1);
 		layer[2]->setAlphaBeta(0, 1); 
 		layer[3]->setAlphaBeta(0, 1); 
+		layer[4]->setAlphaBeta(0, 1); 
+		layer[5]->setAlphaBeta(0, 1); 
+		layer[6]->setAlphaBeta(0, 1); 
+		layer[7]->setAlphaBeta(0, 1); 
 		l_small[0]->setAlphaBeta(0, 1);
 		l_small[1]->setAlphaBeta(0, 1);
 		l_small[2]->setAlphaBeta(0, 1);
@@ -207,20 +215,22 @@ int run(std::string run_number, std::string sector="C14")
 		
 		for(int iLayer = 0; iLayer<sizeof(layer)/sizeof(layer[0]); iLayer++) {
 			histos->h_raw_hits[iLayer]->Fill(layer[iLayer]->getNHits()); // all hits before any rejection
-			histos->h_raw_hits_small[iLayer]->Fill(l_small[iLayer]->getNHits());
+			
+			if(iLayer<4) histos->h_raw_hits_small[iLayer]->Fill(l_small[iLayer]->getNHits());
 
 			layer[iLayer]->bookFiredStrips(strips,pdo); // here we reject strips with pdo<64 and we also mask the noisy strips
-			l_small[iLayer]->bookFiredStrips(strips,pdo);
+			if(iLayer<4) l_small[iLayer]->bookFiredStrips(strips,pdo);
 
 			v_strips_layer[iLayer] = layer[iLayer]->getFiredStrips();
-			v_strips_layer_small[iLayer] = l_small[iLayer]->getFiredStrips();
+			if(iLayer<4) v_strips_layer_small[iLayer] = l_small[iLayer]->getFiredStrips();
 			
-			for(int i=0; i<v_strips_layer_small[iLayer].size(); i++)
-			{
-			  // int stripIndex = (v_strips_layer_small[iLayer].at(i)<1536) ? (std::abs(1535-v_strips_layer_small[iLayer].at(i))+1024) : v_strips_layer_small[iLayer].at(i);
-			   histos->h_strip_index_SB[iLayer]->Fill(v_strips_layer_small[iLayer].at(i));
+			if(iLayer<4) {
+				for(int i=0; i<v_strips_layer_small[iLayer].size(); i++)
+				{
+			  		// int stripIndex = (v_strips_layer_small[iLayer].at(i)<1536) ? (std::abs(1535-v_strips_layer_small[iLayer].at(i))+1024) : v_strips_layer_small[iLayer].at(i);
+			   		histos->h_strip_index_SB[iLayer]->Fill(v_strips_layer_small[iLayer].at(i));
+				}
 			}
-
 			for(int i=0; i<v_strips_layer[iLayer].size(); i++) {
 				histos->h_strip_index_vs_tdo[iLayer]->Fill(v_strips_layer[iLayer].at(i),tdo->at(layer[iLayer]->getHitIndex(v_strips_layer[iLayer].at(i))));
 				histos->h_strip_index_vs_relbcid[iLayer]->Fill(v_strips_layer[iLayer].at(i),relbcid->at(layer[iLayer]->getHitIndex(v_strips_layer[iLayer].at(i))));
@@ -228,11 +238,13 @@ int run(std::string run_number, std::string sector="C14")
 				histos->h_strip_index_vs_pdo0[iLayer]->Fill(v_strips_layer[iLayer].at(i),pdo->at(layer[iLayer]->getHitIndex(v_strips_layer[iLayer].at(i))));
 			}
 
-			for(int i=0; i<v_strips_layer_small[iLayer].size(); i++) {
-				histos->h_strip_index_vs_tdo_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),tdo->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
-				histos->h_strip_index_vs_relbcid_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),relbcid->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
-				histos->h_strip_index_vs_bcid_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),bcid->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
-				histos->h_strip_index_vs_pdo0_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),pdo->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
+			if(iLayer<4) {
+				for(int i=0; i<v_strips_layer_small[iLayer].size(); i++) {
+					histos->h_strip_index_vs_tdo_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),tdo->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
+					histos->h_strip_index_vs_relbcid_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),relbcid->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
+					histos->h_strip_index_vs_bcid_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),bcid->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
+					histos->h_strip_index_vs_pdo0_small[iLayer]->Fill(v_strips_layer_small[iLayer].at(i),pdo->at(l_small[iLayer]->getHitIndex(v_strips_layer_small[iLayer].at(i))));
+				}
 			}
 
 			for(int i=0; i<v_strips_layer[iLayer].size(); i++)
@@ -241,10 +253,10 @@ int run(std::string run_number, std::string sector="C14")
 			}
 			
 			cl_lay[iLayer] = new Cluster(layer[iLayer],pdo,relbcid,tdo,radius);
-			cl_lay_small[iLayer] = new Cluster(l_small[iLayer],pdo,relbcid,tdo,radius);
+			if(iLayer<4) cl_lay_small[iLayer] = new Cluster(l_small[iLayer],pdo,relbcid,tdo,radius);
 
 			histos->h_nclusters[iLayer]->Fill(cl_lay[iLayer]->getNClusters2());
-			histos->h_nclusters_small[iLayer]->Fill(cl_lay_small[iLayer]->getNClusters2());
+			if(iLayer<4) histos->h_nclusters_small[iLayer]->Fill(cl_lay_small[iLayer]->getNClusters2());
 			
 			int tot_strips[sizeof(layer)/sizeof(layer[0])] = {0, 0, 0, 0};
 			int tot_strips_small[sizeof(l_small)/sizeof(l_small[0])] = {0, 0, 0, 0};
@@ -322,6 +334,7 @@ int run(std::string run_number, std::string sector="C14")
 			v_lead_cl_charge.clear();
 			v_lead_cl_charge.shrink_to_fit();
 
+if(iLayer<4) {
 			for(int icl = 0; icl<cl_lay_small[iLayer]->getNClusters2(); icl++) {
 				std::vector<float> v_strip_times;
 				//if(cl_lay_small[iLayer]->getTotPdo(icl)==2044) continue;
@@ -364,19 +377,19 @@ int run(std::string run_number, std::string sector="C14")
 			#endif
 				
 			} // for-loop over clusters SB 
-
+}
 			if(cl_lay[iLayer]->getNClusters2()>0){
 				histos->h_raw_hits_vs_tot_strips[iLayer]->Fill(tot_strips[iLayer],layer[iLayer]->getNHits());
 				single_strip_counter[iLayer] += cl_lay[iLayer]->getNSingleStrips();
 				//total_hits_SM1++;		
 			}
-
+if(iLayer<4) {
 			if(cl_lay_small[iLayer]->getNClusters2()>0){
 				histos->h_raw_hits_vs_tot_strips_small[iLayer]->Fill(tot_strips_small[iLayer],l_small[iLayer]->getNHits());
 				single_strip_counter_small[iLayer] += cl_lay_small[iLayer]->getNSingleStrips();
 				//total_hits_TZ++;		
 			}
-
+}
 
 		} //end ilayer for-loop
 //  End Clustering
@@ -393,14 +406,14 @@ int run(std::string run_number, std::string sector="C14")
 // some more plots may be needed similar to those described here as a cross-check. After each step the new corrected positions at a time need to be used.
 // Another useful plot to study is the distance between the reconstructed cluster and the track found. Check for consistency if it peaks at 0.
 // Dont forget to adjust the axes limits in Histograms.h
-		layer[0]->setAlphaBeta(-405.641-0.16, (1-0.0318));
+/*		layer[0]->setAlphaBeta(-405.641-0.16, (1-0.0318));
 		layer[1]->setAlphaBeta(-405.641-0.23, (1-0.0318));
 		layer[2]->setAlphaBeta(-405.641-4.56-0.027, (1-0.0318));
 		layer[3]->setAlphaBeta(-405.641+4.144+0.022, (1-0.0318)); 
 		
 		l_small[2]->setAlphaBeta(33.000-0.05, (1-0.0448)); 
 		l_small[3]->setAlphaBeta(35.778-0.1225, (1-0.0467)); 
-
+*/
 		float pos_sby1 = cl_lay_small[1]->getPosition(0); // SBY1 reference chamber position
 
 		if(cl_lay_small[2]->getNClusters2()==1 && cl_lay_small[3]->getNClusters2()==1)
@@ -460,7 +473,7 @@ int run(std::string run_number, std::string sector="C14")
 			histos->h_diffpos_stereolay1->Fill(pos_sby1-pos_l3, pos_sby1);
 			histos->h_diffpos_stereolay0->Fill(pos_sby1-pos_l2, pos_sby1);
 		}
-
+/*
 		histos->h_clus_positions_small_corr[1]->Fill(cl_lay_small[1]->getCorrPosition(0));
 		// SBY2
 		for(int icl2=0; icl2<cl_lay_small[2]->getNClusters2(); icl2++) histos->h_clus_positions_small_corr[2]->Fill(cl_lay_small[2]->getCorrPosition(icl2));
@@ -1651,15 +1664,17 @@ int run(std::string run_number, std::string sector="C14")
 
 			delete track;
 		}
-
+*/
 // ========================= End tracking ==============================================
 
-		for(int iLayer=0; iLayer<4; iLayer++) 
+		for(int iLayer=0; iLayer<8; iLayer++) 
 		{
 			delete layer[iLayer];
 			delete cl_lay[iLayer];
-			delete l_small[iLayer];
-			delete cl_lay_small[iLayer];
+			if(iLayer<4) {
+				delete l_small[iLayer];
+				delete cl_lay_small[iLayer];
+			}
 		}
 
 		delete trigger;
@@ -1668,8 +1683,10 @@ int run(std::string run_number, std::string sector="C14")
 		{
 			v_strips_layer[i].clear();
 			v_strips_layer[i].shrink_to_fit();
-			v_strips_layer_small[i].clear();
-			v_strips_layer_small[i].shrink_to_fit();
+			if(i<4) {
+				v_strips_layer_small[i].clear();
+				v_strips_layer_small[i].shrink_to_fit();
+			}
 		}
 		v_strips_trigger.clear();
 		v_strips_trigger.shrink_to_fit();
@@ -1702,7 +1719,7 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_cutflow->GetXaxis()->SetBinLabel(5, cutangletitle.c_str());
 	histos->h_cutflow->GetYaxis()->SetTitle("events %");
 
-	for(int iLayer=0; iLayer<4; iLayer++) 
+	for(int iLayer=0; iLayer<8; iLayer++) 
 	{
 		out_file->cd("SM1/raw_hits");
 		histos->h_raw_hits[iLayer]->Write();
