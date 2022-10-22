@@ -51,14 +51,15 @@ int run(std::string run_number, std::string sector="C14")
 	out_file->mkdir("track_candidates/residuals");
 	out_file->mkdir("track_candidates/anglecut");
 	out_file->mkdir("track_candidates/SM1");
+	out_file->mkdir("track_candidates/LM2");
 	out_file->mkdir("track_candidates/inclusive/IP1-4points/track_displays");
 	out_file->mkdir("track_candidates/inclusive/IP2-4points/track_displays");
 	out_file->mkdir("track_candidates/inclusive/stereo-4points/track_displays");
 	
 	gROOT->cd();
 
-	std::string filename = "data_test.1666198279._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.wr.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUL2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUN2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
-
+	std::string filename = "/eos/user/i/idrivask/Chara/GIF++_data/data_test.1666204329._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root";//"data_test.1666428247._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUL2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUN2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
+//"/eos/user/i/idrivask/Chara/GIF++_data/data_test.1666204329._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root"; //
 	TreeReader* treeReader = new TreeReader(filename.c_str(),"nsw");
 	std::cout<<"got the tree\n";
 	TTree *tree = treeReader->the_tree;
@@ -158,11 +159,12 @@ int run(std::string run_number, std::string sector="C14")
 			if(iLayer<4)
 				l_small[iLayer] = new Layer(iLayer, false, false);
 		}
-
+//LM2
 		layer[0]->setAlphaBeta(0, 1);
 		layer[1]->setAlphaBeta(0, 1);
 		layer[2]->setAlphaBeta(0, 1); 
 		layer[3]->setAlphaBeta(0, 1); 
+// SM1
 		layer[4]->setAlphaBeta(0, 1); 
 		layer[5]->setAlphaBeta(0, 1); 
 		layer[6]->setAlphaBeta(0, 1); 
@@ -184,7 +186,8 @@ int run(std::string run_number, std::string sector="C14")
 		{
 			if(layers->at(iHit) == 3 && radius->at(iHit)==6) trigger->AddHitIndex(iHit);
 			for(int ilay=0; ilay<sizeof(layer)/sizeof(layer[0]); ilay++) {//loop over layers
-				if(layers->at(iHit) == ilay && ( radius->at(iHit)==4 || radius->at(iHit)==5 )) layer[ilay]->AddHitIndex(iHit);
+				if(ilay > 3 && layers->at(iHit) == ilay-4 && ( radius->at(iHit)==4 || radius->at(iHit)==5 )) layer[ilay]->AddHitIndex(iHit);
+				else if(ilay < 4 && layers->at(iHit) == ilay && ( radius->at(iHit)==0 || radius->at(iHit)==1 )) layer[ilay]->AddHitIndex(iHit);
 				else if(layers->at(iHit) == ilay && ( radius->at(iHit)==2 || radius->at(iHit)==3 ) ) l_small[ilay]->AddHitIndex(iHit);
 				else continue;
 			}
@@ -1695,6 +1698,9 @@ if(iLayer<4) {
 
 	out_file->cd();
 	out_file->mkdir("trigger");
+	out_file->mkdir("LM2/raw_hits");
+	out_file->mkdir("LM2/clusters");
+	out_file->mkdir("LM2/strips");
 	out_file->mkdir("SM1/raw_hits");
 	out_file->mkdir("SM1/clusters");
 	out_file->mkdir("SM1/strips");
@@ -1721,13 +1727,18 @@ if(iLayer<4) {
 
 	for(int iLayer=0; iLayer<8; iLayer++) 
 	{
-		out_file->cd("SM1/raw_hits");
+		if(iLayer>3)
+			out_file->cd("SM1/raw_hits");
+		else out_file->cd("LM2/raw_hits");
 		histos->h_raw_hits[iLayer]->Write();
 		histos->h_strip_index_SM1[iLayer]->Write();
 		histos->h_strip_index_SM1_cluster[iLayer]->Write();
 
 		histos->h_nstrips[iLayer]->SetBinContent(2,single_strip_counter[iLayer]);
-		out_file->cd("SM1/clusters");
+		if(iLayer>3)
+			out_file->cd("SM1/clusters");
+		else out_file->cd("LM2/clusters");
+		
 		histos->h_nclusters[iLayer]->Write();
 		histos->h_nstrips[iLayer]->Write();
 		histos->h_strip_pdo_in_clus[iLayer]->Write();
@@ -1742,16 +1753,21 @@ if(iLayer<4) {
 		histos->h_strip_index_vs_pdo[iLayer]->Write();
 		histos->h_raw_hits_vs_tot_strips[iLayer]->Write();
 		histos->h_cl_size_vs_cl_charge[iLayer]->Write();
+	
 	#ifdef TIME_CALIBRATION
 		histos->h_strip_time_in_clus[iLayer]->Write();
 		histos->h_strip_time_in_clus_earliest[iLayer]->Write();
 	#endif
-		out_file->cd("SM1/strips");
+		if(iLayer>3)
+			out_file->cd("SM1/strips");
+		else out_file->cd("LM2/strips");
 		histos->h_strip_index_vs_tdo[iLayer]->Write();
 		histos->h_strip_index_vs_relbcid[iLayer]->Write();
 		histos->h_strip_index_vs_bcid[iLayer]->Write();
 		histos->h_strip_index_vs_pdo0[iLayer]->Write();
-		out_file->cd("track_candidates/SM1");
+		if(iLayer>3)
+			out_file->cd("track_candidates/SM1");
+		else out_file->cd("track_candidates/LM2");
 		histos->h_nclusters_per_layer_event[iLayer]->Write();
 		histos->h_nstrips_on_track[iLayer]->Write();
 		histos->h_cl_charge_on_track[iLayer]->Write();
@@ -1919,8 +1935,8 @@ if(iLayer<4) {
 		histos->h_strip_index_vs_pdo_small[iLayer]->Write();
 		histos->h_raw_hits_vs_tot_strips_small[iLayer]->Write();
 		histos->h_cl_size_vs_cl_charge_small[iLayer]->Write();
-		histos->h_strip_2044_pdo_SB[iLayer]->Write();
-		histos->h_strip_2044_pdo_SM1[iLayer]->Write();
+	//	histos->h_strip_2044_pdo_SB[iLayer]->Write();
+	//	histos->h_strip_2044_pdo_SM1[iLayer]->Write();
 	#ifdef TIME_CALIBRATION
 		histos->h_strip_time_in_clus_small[iLayer]->Write();
 		histos->h_strip_time_in_clus_earliest_small[iLayer]->Write();

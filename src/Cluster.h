@@ -138,7 +138,7 @@ inline float Cluster::getPosition(int subcluster)
 	float sumpdo = 0; 
 	int totCharge = getTotPdo(subcluster);
 	for(int istrip = 0; istrip < m_v_clusters[subcluster].size(); istrip++){
-	if(m_v_radii[subcluster].at(istrip)==4 || m_v_radii[subcluster].at(istrip)==5) sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY_radius(m_v_clusters[subcluster].at(istrip), m_v_radii[subcluster].at(istrip));
+	if(m_v_radii[subcluster].at(istrip)==4 || m_v_radii[subcluster].at(istrip)==5 || m_v_radii[subcluster].at(istrip)==0 || m_v_radii[subcluster].at(istrip)==1) sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY_radius(m_v_clusters[subcluster].at(istrip), m_v_radii[subcluster].at(istrip));
 	else 
 	 sumpdo += m_v_pdos[subcluster].at(istrip)*this_layer->convertStripToGlobalY(m_v_clusters[subcluster].at(istrip));
 

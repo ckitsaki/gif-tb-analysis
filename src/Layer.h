@@ -63,10 +63,10 @@ inline float Layer::convertLayerToGlobalZ() // return center of drift gaps
 		if(m_layerIndex==3) return 262+lever_arm_0+SM1_width+lever_arm_1+136;
 	}
 	else if(m_isSM1) {
-	if(m_layerIndex==0) return lever_arm_0+262+13.835;
-	if(m_layerIndex==1) return lever_arm_0+262+30.615;
-	if(m_layerIndex==2) return lever_arm_0+262+46.985;
-	if(m_layerIndex==3) return lever_arm_0+262+63.765;
+	if(m_layerIndex==4) return lever_arm_0+262+13.835;
+	if(m_layerIndex==5) return lever_arm_0+262+30.615;
+	if(m_layerIndex==6) return lever_arm_0+262+46.985;
+	if(m_layerIndex==7) return lever_arm_0+262+63.765;
 	}
 	else if(m_isLM2) {
 		if(m_layerIndex==0) return lever_arm_0+262+13.835;
@@ -84,44 +84,44 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius)
 	if(m_isSM1)
 	{
 		if(radius==4) {
-		if(m_layerIndex==0) //eta layers
+		if(m_layerIndex==4) //eta layers
 		{
 		// SM1
 			return 895+35.3+(strip)*0.425; 
 
 		}
-		else if(m_layerIndex==1)
+		else if(m_layerIndex==5)
 		{
 		// SM1
 			return 895+35.3+(strip)*0.425; 
 		}
-		else if(m_layerIndex==2) //stereo layers
+		else if(m_layerIndex==6) //stereo layers
 		{
 			// SM1
 			return 895+35.3+(strip)*0.425; 
 		}
-		else if(m_layerIndex==3) //stereo layers
+		else if(m_layerIndex==7) //stereo layers
 		{
 			return 895+35.3+(strip)*0.425;
 		}
 		} //end radius 4
 		else if(radius==5) {
-			if(m_layerIndex==0 ) //eta layers
+			if(m_layerIndex==4 ) //eta layers
 		{
 		// SM1
 			return 895+35.3+(strip)*0.425; 
 		}
-		else if(m_layerIndex==1)
+		else if(m_layerIndex==5)
 		{
 			// SM1
 			return 895+35.3+(strip)*0.425; 
 		}
 
-		if(m_layerIndex==2 ) //stereo layers
+		if(m_layerIndex==6 ) //stereo layers
 		{
 			return 895+35.3+(strip)*0.425;
 		}
-		else if (m_layerIndex==3)
+		else if (m_layerIndex==7)
 		{
 			if(strip >= 2560 && strip <=2663) return 895+35.3+(strip)*0.425;
 			return 895+35.3+(strip)*0.425;
@@ -132,7 +132,7 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius)
 
 	if(m_isLM2)
 	{
-		if(radius==4) {
+		if(radius==0) {
 		if(m_layerIndex==0) //eta layers
 		{
 		// SM1
@@ -154,7 +154,7 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius)
 			return 895+35.3+(strip)*0.45;
 		}
 		} //end radius 4
-		else if(radius==5) {
+		else if(radius==1) {
 			if(m_layerIndex==0 ) //eta layers
 		{
 		// SM1
@@ -185,44 +185,44 @@ inline float Layer::convertStripToGlobalY_radius(int strip, int radius)
 inline float Layer::convertStripToGlobalY_radius_corr(int strip, int radius)
 {
 	if(radius==4) {
-	if(m_layerIndex==0) //eta layers
+	if(m_layerIndex==4) //eta layers
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
-	else if(m_layerIndex==1)
+	else if(m_layerIndex==5)
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
-	else if(m_layerIndex==2) //stereo layers
+	else if(m_layerIndex==6) //stereo layers
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip)*0.425)*m_beta ); 
 	}
-	else if(m_layerIndex==3) //stereo layers
+	else if(m_layerIndex==7) //stereo layers
 	{
 	    return (m_alpha + (895+35.3+(strip)*0.425)*m_beta );
 	}
 	} //end radius 4
 	else if(radius==5) {
-		if(m_layerIndex==0 ) //eta layers
+		if(m_layerIndex==5 ) //eta layers
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta ); 
 	}
-	else if(m_layerIndex==1)
+	else if(m_layerIndex==5)
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip+1+1)*0.425)*m_beta );
 	}
 
-	if(m_layerIndex==2 ) //stereo layers
+	if(m_layerIndex==6 ) //stereo layers
 	{
 		// SM1
 		return (m_alpha + (895+35.3+(strip-1+1)*0.425)*m_beta ); 
 	}
-	else if (m_layerIndex==3)
+	else if (m_layerIndex==7)
 	{
 		if(strip >= 2560 && strip <=2663) return (m_alpha + (895+35.3+(strip+1+1)*0.425)*m_beta);
 	    else return (m_alpha + (895+35.3+(strip+1)*0.425)*m_beta );
@@ -253,7 +253,7 @@ if(m_isSM1)
 {
 	return (895+35.3+(strip)*0.425);
 }
-else if(m_isLM2) return (895+35.3+(strip)*0.45);
+if(m_isLM2) return (895+35.3+(strip)*0.45);
 
 // SB
 /////////////////
