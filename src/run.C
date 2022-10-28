@@ -58,8 +58,8 @@ int run(std::string run_number, std::string sector="C14")
 	
 	gROOT->cd();
 
-	std::string filename = "/eos/user/i/idrivask/Chara/GIF++_data/data_test.1666204329._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root";//"data_test.1666428247._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUL2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";//"/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++JUN2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
-//"/eos/user/i/idrivask/Chara/GIF++_data/data_test.1666204329._.daq.RAW._lb0000._BB5-C14-MM-swROD._0001.simple.root"; //
+	std::string filename = "/eos/atlas/atlascerngroupdisk/det-nsw/bb5/cosmics/data/GIF++OCT2022/data_test."+run_number+"._.daq.RAW._lb0000._BB5-"+sector+"-MM-swROD._0001.simple.root";
+
 	TreeReader* treeReader = new TreeReader(filename.c_str(),"nsw");
 	std::cout<<"got the tree\n";
 	TTree *tree = treeReader->the_tree;
@@ -398,7 +398,7 @@ if(iLayer<4) {
 //  End Clustering
 
 // Start tracking
-		if( !(cl_lay_small[1]->getNClusters2()==1)) continue; // only events which give exactly one cluster on SBY1 are processed		
+		if( !(cl_lay_small[1]->getNClusters2()==1) && !(cl_lay_small[0]->getNClusters2()==1)) continue; // only events which give exactly one cluster on SBY1 are processed		
 		counter1++; // count events with exactly one cluster on SBY1 
 
 // Alignment needs some iteration 

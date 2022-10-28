@@ -657,11 +657,11 @@ inline void Histograms::init()
 	h_diffpos_stereolay1->GetXaxis()->SetTitle("#Delta y(SBY1 - IP4) [mm]");
 	h_diffpos_stereolay1->GetYaxis()->SetTitle("y_{SBY1} [mm]");
 
-	h_res_SBY2_SBY3_vs_SBY2 = new TH2F("h_res_SBY2_SBY3_vs_SBY2", "", 20000, -2, 2,600,1350,1950);
+	h_res_SBY2_SBY3_vs_SBY2 = new TH2F("h_res_SBY2_SBY3_vs_SBY2", "", 50000, -5, 5,600,1350,1950);
 	h_res_SBY2_SBY3_vs_SBY2->GetXaxis()->SetTitle("#Delta y(SBY2-SBY3) [mm]");
 	h_res_SBY2_SBY3_vs_SBY2->GetYaxis()->SetTitle("y_{SBY2} [mm]");
 
-	h_res_SBY2_SBY3_vs_SBY3 = new TH2F("h_res_SBY2_SBY3_vs_SBY3", "", 20000, -2, 2,600,1350,1950);
+	h_res_SBY2_SBY3_vs_SBY3 = new TH2F("h_res_SBY2_SBY3_vs_SBY3", "", 50000, -5, 5,600,1350,1950);
 	h_res_SBY2_SBY3_vs_SBY3->GetXaxis()->SetTitle("#Delta y(SBY2-SBY3) [mm]");
 	h_res_SBY2_SBY3_vs_SBY3->GetYaxis()->SetTitle("y_{SBY3} [mm]");
 
@@ -689,27 +689,27 @@ inline void Histograms::init()
 	h_align_etaout_ontrack->GetXaxis()->SetTitle("IP1 cluster position [mm]");
 	h_align_etaout_ontrack->GetYaxis()->SetTitle("SB1Y-IP1 cluster position [mm]");
 
-	h_sby1_minus_pos_eta_in_vs_pos_eta_in = new TH2F("h_sby1_minus_pos_eta_in_vs_pos_eta_in", "SB1Y-IP2 vs IP2 position", 700, 1300, 2000, 700, -350, 350);
+	h_sby1_minus_pos_eta_in_vs_pos_eta_in = new TH2F("h_sby1_minus_pos_eta_in_vs_pos_eta_in", "SB1Y-IP2 vs IP2 position", 1500, 1300, 2800, 700, -350, 350);
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in->GetXaxis()->SetTitle("IP2 cluster position [mm]");
 	h_sby1_minus_pos_eta_in_vs_pos_eta_in->GetYaxis()->SetTitle("SB1Y-IP2 cluster position [mm]");
 
-	h_sby1_minus_stereo_vs_stereo = new TH2F("h_sby1_minus_stereo_vs_stereo", "BS1Y-stereo vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
+	h_sby1_minus_stereo_vs_stereo = new TH2F("h_sby1_minus_stereo_vs_stereo", "BS1Y-stereo vs SBY1 position", 1500, 1300, 2800, 700, -350, 350);
 	h_sby1_minus_stereo_vs_stereo->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_vs_stereo->GetYaxis()->SetTitle("SB1Y-stereo cluster position [mm]");
 
-	h_sby1_minus_stereo_in_vs_stereo_in = new TH2F("h_sby1_minus_stereo_in_vs_stereo_in", "SB1Y-stereo_in vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
+	h_sby1_minus_stereo_in_vs_stereo_in = new TH2F("h_sby1_minus_stereo_in_vs_stereo_in", "SB1Y-stereo_in vs SBY1 position", 1500, 1300, 2800, 700, -350, 350);
 	h_sby1_minus_stereo_in_vs_stereo_in->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_in_vs_stereo_in->GetYaxis()->SetTitle("SBY1-stereo_in cluster position [mm]");
 
-	h_sby1_minus_stereo_out_vs_stereo_out = new TH2F("h_sby1_minus_stereo_out_vs_stereo_out", "SBY1-stereo_out vs SBY1 position", 700, 1300, 2000, 700, -350, 350);
+	h_sby1_minus_stereo_out_vs_stereo_out = new TH2F("h_sby1_minus_stereo_out_vs_stereo_out", "SBY1-stereo_out vs SBY1 position", 1500, 1300, 2800, 700, -350, 350);
 	h_sby1_minus_stereo_out_vs_stereo_out->GetXaxis()->SetTitle("SBY1 cluster position [mm]");
 	h_sby1_minus_stereo_out_vs_stereo_out->GetYaxis()->SetTitle("SBY1-stereo_out cluster position [mm]");
 
-	h_sby1_minus_sby2_vs_sby2 = new TH2F("h_sby1_minus_sby2_vs_sby2", "BSY1-BSY2 vs BSY2 position", 700, 1300, 2000, 700, 350, -350);
+	h_sby1_minus_sby2_vs_sby2 = new TH2F("h_sby1_minus_sby2_vs_sby2", "BSY1-BSY2 vs BSY2 position", 1500, 1300, 2800, 700, 350, -350);
 	h_sby1_minus_sby2_vs_sby2->GetXaxis()->SetTitle("BSY2 cluster position [mm]");
 	h_sby1_minus_sby2_vs_sby2->GetYaxis()->SetTitle("BSY1-BSY2 cluster position [mm]");
 
-	h_sby1_minus_sby3_vs_sby3 = new TH2F("h_sby1_minus_sby3_vs_sby3", "BS1Y-BSY3 vs BSY3 position", 700, 1300, 2000, 700, 350, -350);
+	h_sby1_minus_sby3_vs_sby3 = new TH2F("h_sby1_minus_sby3_vs_sby3", "BS1Y-BSY3 vs BSY3 position", 1500, 1300, 2800, 700, 350, -350);
 	h_sby1_minus_sby3_vs_sby3->GetXaxis()->SetTitle("BSY3 cluster position [mm]");
 	h_sby1_minus_sby3_vs_sby3->GetYaxis()->SetTitle("BSY1-BSY3 cluster position [mm]");
 

@@ -52,27 +52,29 @@ inline Layer::Layer(int layerIndex, bool isSM1, bool isLM2 /*, std::vector<int> 
 
 inline float Layer::convertLayerToGlobalZ() // return center of drift gaps
 {
-	float lever_arm_0 = 2153.;
-	float lever_arm_1 = 790.;
-	float SM1_width = 78.;
+	//1.6cm -> drift (5mm) -> ampl gap (124microns)
+	float lever_arm_0 = 1420.; // BSY1 - LM2
+	float lever_arm_1 = 110.; // LM2 - SM1
+	float lever_arm_2 = 810.; // SM1 - BSY2
+	float SM1LM2_width = 78.;
 	if(!m_isSM1 && !m_isLM2)  // Small chambers
 	{
 		if(m_layerIndex==0) return 0; 
-		if(m_layerIndex==1) return 262;
-		if(m_layerIndex==2) return 262+lever_arm_0+SM1_width+lever_arm_1;
-		if(m_layerIndex==3) return 262+lever_arm_0+SM1_width+lever_arm_1+136;
+		if(m_layerIndex==1) return 272;
+		if(m_layerIndex==2) return 272+lever_arm_0+2*SM1LM2_width+lever_arm_1+lever_arm_2;
+		if(m_layerIndex==3) return 272+lever_arm_0+2*SM1LM2_width+lever_arm_1+lever_arm_2+137;
 	}
 	else if(m_isSM1) {
-	if(m_layerIndex==4) return lever_arm_0+262+13.835;
-	if(m_layerIndex==5) return lever_arm_0+262+30.615;
-	if(m_layerIndex==6) return lever_arm_0+262+46.985;
-	if(m_layerIndex==7) return lever_arm_0+262+63.765;
+	if(m_layerIndex==4) return lever_arm_0+272+13.835+SM1LM2_width+lever_arm_1;
+	if(m_layerIndex==5) return lever_arm_0+272+30.615+SM1LM2_width+lever_arm_1;
+	if(m_layerIndex==6) return lever_arm_0+272+46.985+SM1LM2_width+lever_arm_1;
+	if(m_layerIndex==7) return lever_arm_0+272+63.765+SM1LM2_width+lever_arm_1;
 	}
-	else if(m_isLM2) {
-		if(m_layerIndex==0) return lever_arm_0+262+13.835;
-		if(m_layerIndex==1) return lever_arm_0+262+30.615;
-		if(m_layerIndex==2) return lever_arm_0+262+46.985;
-		if(m_layerIndex==3) return lever_arm_0+262+63.765;
+	else if(m_isLM2) { 
+		if(m_layerIndex==0) return lever_arm_0+272+13.835;
+		if(m_layerIndex==1) return lever_arm_0+272+30.615;
+		if(m_layerIndex==2) return lever_arm_0+272+46.985;
+		if(m_layerIndex==3) return lever_arm_0+272+63.765;
 	}
 
 	return 0;
