@@ -261,6 +261,30 @@ public:
 
 	TH2F* h_align_etaout_ontrack;
 
+	TH2F* h_align_eta_out_ontrack_onxaxis;
+	TH2F* h_align_eta_in_ontrack_onxaxis;
+	TH2F* h_align_stereo_ontrack_onxaxis;
+	TH2F* h_align_SBY2_ontrack_onxaxis;
+	TH2F* h_align_SBY3_ontrack_onxaxis;
+
+	TH2F* h_align_eta_out_onxaxis;
+	TH2F* h_align_eta_in_onxaxis;
+	TH2F* h_align_stereo_onxaxis;
+	TH2F* h_align_SBY2_onxaxis;
+	TH2F* h_align_SBY3_onxaxis;
+
+	TH2F* h_align_eta_out_SBX0_onxaxis;
+	TH2F* h_align_eta_in_SBX0_onxaxis;
+	TH2F* h_align_stereo_SBX0_onxaxis;
+	TH2F* h_align_SBY2_SBX0_onxaxis;
+	TH2F* h_align_SBY3_SBX0_onxaxis;
+
+	TH2F* h_align_eta_out_SBX0_ontrack_onxaxis;
+	TH2F* h_align_eta_in_SBX0_ontrack_onxaxis;
+	TH2F* h_align_stereo_SBX0_ontrack_onxaxis;
+	TH2F* h_align_SBY2_SBX0_ontrack_onxaxis;
+	TH2F* h_align_SBY3_SBX0_ontrack_onxaxis;
+
 	Histograms();
 	inline void init();
 
@@ -672,6 +696,86 @@ inline void Histograms::init()
 	h_res_SBY3_SBY1_vs_SBY1 = new TH2F("h_res_SBY3_SBY1_vs_SBY1", "", 10000, -100, 100,600,1350,1950);
 	h_res_SBY3_SBY1_vs_SBY1->GetXaxis()->SetTitle("#Delta y(SBY3-SBY1) [mm]");
 	h_res_SBY3_SBY1_vs_SBY1->GetYaxis()->SetTitle("y_{SBY1} [mm]");
+
+	h_align_eta_out_ontrack_onxaxis = new TH2F("h_align_eta_out_ontrack_onxaxis", "",200, -.4, .4, 10000, -100, 100);
+	h_align_eta_out_ontrack_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_eta_out_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
+
+	h_align_eta_out_onxaxis = new TH2F("h_align_eta_out_onxaxis", "",200, -.4, .4, 10000, -100, 100);
+	h_align_eta_out_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_eta_out_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
+
+	h_align_eta_out_SBX0_onxaxis = new TH2F("h_align_eta_out_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_out_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_out_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
+
+	h_align_eta_out_SBX0_ontrack_onxaxis = new TH2F("h_align_eta_out_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_out_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_out_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
+
+	h_align_eta_in_ontrack_onxaxis = new TH2F("h_align_eta_in_ontrack_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_eta_in_ontrack_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_eta_in_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
+
+	h_align_eta_in_onxaxis = new TH2F("h_align_eta_in_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_eta_in_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_eta_in_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
+
+	h_align_eta_in_SBX0_onxaxis = new TH2F("h_align_eta_in_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_in_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_in_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
+
+	h_align_eta_in_SBX0_ontrack_onxaxis = new TH2F("h_align_eta_in_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_in_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_in_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
+
+	h_align_stereo_ontrack_onxaxis = new TH2F("h_align_stereo_ontrack_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_stereo_ontrack_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_stereo_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
+
+	h_align_stereo_onxaxis = new TH2F("h_align_stereo_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_stereo_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_stereo_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
+
+	h_align_stereo_SBX0_onxaxis = new TH2F("h_align_stereo_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_stereo_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_stereo_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
+
+	h_align_stereo_SBX0_ontrack_onxaxis = new TH2F("h_align_stereo_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_stereo_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_stereo_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
+
+	h_align_SBY2_ontrack_onxaxis = new TH2F("h_align_SBY2_ontrack_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_SBY2_ontrack_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_SBY2_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
+
+	h_align_SBY2_onxaxis = new TH2F("h_align_SBY2_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_SBY2_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_SBY2_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
+
+	h_align_SBY2_SBX0_onxaxis = new TH2F("h_align_SBY2_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY2_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY2_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
+
+	h_align_SBY2_SBX0_ontrack_onxaxis = new TH2F("h_align_SBY2_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY2_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY2_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
+
+	h_align_SBY3_ontrack_onxaxis = new TH2F("h_align_SBY3_ontrack_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_SBY3_ontrack_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_SBY3_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
+
+	h_align_SBY3_onxaxis = new TH2F("h_align_SBY3_onxaxis", "", 200, -.4, .4, 10000, -100, 100);
+	h_align_SBY3_onxaxis->GetXaxis()->SetTitle("#phi [mm]");
+	h_align_SBY3_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
+
+	h_align_SBY3_SBX0_onxaxis = new TH2F("h_align_SBY3_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY3_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY3_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
+
+	h_align_SBY3_SBX0_ontrack_onxaxis = new TH2F("h_align_SBY3_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY3_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY3_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
 
 	h_beamProfile = new TH2F("h_beamProfile", "", 600, 1300, 2000, 100, -.4, .4);
 	h_beamProfile->GetYaxis()->SetTitle("#phi [mm]");
