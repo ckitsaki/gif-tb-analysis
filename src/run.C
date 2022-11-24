@@ -405,16 +405,26 @@ int run(std::string run_number, std::string sector="C14")
 
 		if(cl_lay_small[0]->getNClusters2()==1)
 		{
-			if(cl_lay[0]->getNClusters2()==1)
+			if(cl_lay[0]->getNClusters2()==1) {
 				histos->h_align_eta_out_SBX0_onxaxis->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - cl_lay[0]->getCorrPosition(0));
-			if(cl_lay[1]->getNClusters2()==1)
+				histos->h_align_eta_out_SBX0_onxaxis_corrected->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (cl_lay[0]->getCorrPosition(0) -4.899 +0.0026*cl_lay_small[0]->getPosition(0) ));
+			}
+			if(cl_lay[1]->getNClusters2()==1) {
 				histos->h_align_eta_in_SBX0_onxaxis->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - cl_lay[1]->getCorrPosition(0));
-			if(cl_lay[2]->getNClusters2()==1 && cl_lay[3]->getNClusters2()==1)
+				histos->h_align_eta_in_SBX0_onxaxis_corrected->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (cl_lay[1]->getCorrPosition(0) -3.176 + 0.0017*cl_lay_small[0]->getPosition(0)));
+			}
+			if(cl_lay[2]->getNClusters2()==1 && cl_lay[3]->getNClusters2()==1) {
 				histos->h_align_stereo_SBX0_onxaxis->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (+0.56 + ((cl_lay[3]->getCorrPosition(0)+cl_lay[2]->getCorrPosition(0)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)) ));
-			if(cl_lay_small[2]->getNClusters2()==1)
+				histos->h_align_stereo_SBX0_onxaxis_corrected->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (+0.56 + ( ( (cl_lay[3]->getCorrPosition(0)+cl_lay[2]->getCorrPosition(0)) / 2*TMath::Cos(1.5*TMath::Pi()/180.)) - 4.032 + 0.0022*cl_lay_small[0]->getPosition(0) )));
+			}
+			if(cl_lay_small[2]->getNClusters2()==1) {
 				histos->h_align_SBY2_SBX0_onxaxis->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - cl_lay_small[2]->getCorrPosition(0));
-			if(cl_lay_small[3]->getNClusters2()==1)
+				histos->h_align_SBY2_SBX0_onxaxis_corrected->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (cl_lay_small[2]->getCorrPosition(0) -6.443 + 0.0036*cl_lay_small[0]->getPosition(0)));
+			}
+			if(cl_lay_small[3]->getNClusters2()==1) {
 				histos->h_align_SBY3_SBX0_onxaxis->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - cl_lay_small[3]->getCorrPosition(0));
+				histos->h_align_SBY3_SBX0_onxaxis_corrected->Fill(cl_lay_small[0]->getPosition(0), pos_sby1 - (cl_lay_small[3]->getCorrPosition(0) -5.095 + 0.0029*cl_lay_small[0]->getPosition(0)));
+			}
 		}
 
 		if(cl_lay[2]->getNClusters2()==1 && cl_lay[3]->getNClusters2()==1)
@@ -479,6 +489,8 @@ int run(std::string run_number, std::string sector="C14")
 			histos->h_sby1_minus_stereo_out_vs_stereo_out->Fill(pos_sby1, pos_sby1-pos_l3);
 			histos->h_beamProfile->Fill(pos_stereo_y, pos_stereo_x);
 			histos->h_align_eta_in_onxaxis->Fill(pos_stereo_x, pos_sby1-pos_l1);
+			if(cl_lay_small[0]->getNClusters2()==1)
+				histos->h_alignX_phi_vs_SBX0->Fill(cl_lay_small[0]->getPosition(0), pos_stereo_x);
 		}
 
 		if(cl_lay[2]->getNClusters2()==1 && cl_lay[3]->getNClusters2()==1 && cl_lay[0]->getNClusters2()==1)
@@ -2047,11 +2059,18 @@ int run(std::string run_number, std::string sector="C14")
 	histos->h_align_SBY2_SBX0_onxaxis->Write();
 	histos->h_align_SBY3_SBX0_onxaxis->Write();
 
+	histos->h_align_eta_out_SBX0_onxaxis_corrected->Write();
+	histos->h_align_eta_in_SBX0_onxaxis_corrected->Write();
+	histos->h_align_stereo_SBX0_onxaxis_corrected->Write();
+	histos->h_align_SBY2_SBX0_onxaxis_corrected->Write();
+	histos->h_align_SBY3_SBX0_onxaxis_corrected->Write();
+
 	histos->h_align_eta_out_onxaxis->Write();
 	histos->h_align_eta_in_onxaxis->Write();
 	histos->h_align_stereo_onxaxis->Write();
 	histos->h_align_SBY2_onxaxis->Write();
 	histos->h_align_SBY3_onxaxis->Write();
+	histos->h_alignX_phi_vs_SBX0->Write();
 
 	for(int ilayer=0; ilayer<4; ilayer++)
 	{

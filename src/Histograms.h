@@ -273,11 +273,19 @@ public:
 	TH2F* h_align_SBY2_onxaxis;
 	TH2F* h_align_SBY3_onxaxis;
 
+	TH2F* h_alignX_phi_vs_SBX0;
+
 	TH2F* h_align_eta_out_SBX0_onxaxis;
 	TH2F* h_align_eta_in_SBX0_onxaxis;
 	TH2F* h_align_stereo_SBX0_onxaxis;
 	TH2F* h_align_SBY2_SBX0_onxaxis;
 	TH2F* h_align_SBY3_SBX0_onxaxis;
+
+	TH2F* h_align_eta_out_SBX0_onxaxis_corrected;
+	TH2F* h_align_eta_in_SBX0_onxaxis_corrected;
+	TH2F* h_align_stereo_SBX0_onxaxis_corrected;
+	TH2F* h_align_SBY2_SBX0_onxaxis_corrected;
+	TH2F* h_align_SBY3_SBX0_onxaxis_corrected;
 
 	TH2F* h_align_eta_out_SBX0_ontrack_onxaxis;
 	TH2F* h_align_eta_in_SBX0_ontrack_onxaxis;
@@ -709,6 +717,14 @@ inline void Histograms::init()
 	h_align_eta_out_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_eta_out_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
 
+	h_align_eta_out_SBX0_onxaxis_corrected = new TH2F("h_align_eta_out_SBX0_onxaxis_corrected", "corrected", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_out_SBX0_onxaxis_corrected->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_out_SBX0_onxaxis_corrected->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
+
+	h_alignX_phi_vs_SBX0 = new TH2F("h_alignX_phi_vs_SBX0", "", 600, 1350, 1950, 1000, -.5, .5);
+	h_alignX_phi_vs_SBX0->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_alignX_phi_vs_SBX0->GetYaxis()->SetTitle("#phi [mm]");
+
 	h_align_eta_out_SBX0_ontrack_onxaxis = new TH2F("h_align_eta_out_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_eta_out_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_eta_out_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP1) [mm]");
@@ -724,6 +740,10 @@ inline void Histograms::init()
 	h_align_eta_in_SBX0_onxaxis = new TH2F("h_align_eta_in_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_eta_in_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_eta_in_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
+
+	h_align_eta_in_SBX0_onxaxis_corrected = new TH2F("h_align_eta_in_SBX0_onxaxis_corrected", "corrected", 600, 1350, 1950, 1000, -100, 100);
+	h_align_eta_in_SBX0_onxaxis_corrected->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_eta_in_SBX0_onxaxis_corrected->GetYaxis()->SetTitle("#Delta y (SBY1 - IP2) [mm]");
 
 	h_align_eta_in_SBX0_ontrack_onxaxis = new TH2F("h_align_eta_in_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_eta_in_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
@@ -741,6 +761,10 @@ inline void Histograms::init()
 	h_align_stereo_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_stereo_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
 
+	h_align_stereo_SBX0_onxaxis_corrected = new TH2F("h_align_stereo_SBX0_onxaxis_corrected", "corrected", 600, 1350, 1950, 1000, -100, 100);
+	h_align_stereo_SBX0_onxaxis_corrected->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_stereo_SBX0_onxaxis_corrected->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
+
 	h_align_stereo_SBX0_ontrack_onxaxis = new TH2F("h_align_stereo_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_stereo_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_stereo_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - #eta^{stereo}) [mm]");
@@ -757,6 +781,10 @@ inline void Histograms::init()
 	h_align_SBY2_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_SBY2_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
 
+	h_align_SBY2_SBX0_onxaxis_corrected = new TH2F("h_align_SBY2_SBX0_onxaxis_corrected", "corrected", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY2_SBX0_onxaxis_corrected->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY2_SBX0_onxaxis_corrected->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
+
 	h_align_SBY2_SBX0_ontrack_onxaxis = new TH2F("h_align_SBY2_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_SBY2_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_SBY2_SBX0_ontrack_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY2) [mm]");	
@@ -772,6 +800,10 @@ inline void Histograms::init()
 	h_align_SBY3_SBX0_onxaxis = new TH2F("h_align_SBY3_SBX0_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_SBY3_SBX0_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
 	h_align_SBY3_SBX0_onxaxis->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
+
+	h_align_SBY3_SBX0_onxaxis_corrected = new TH2F("h_align_SBY3_SBX0_onxaxis_corrected", "corrected", 600, 1350, 1950, 1000, -100, 100);
+	h_align_SBY3_SBX0_onxaxis_corrected->GetXaxis()->SetTitle("SBX0 [mm]");
+	h_align_SBY3_SBX0_onxaxis_corrected->GetYaxis()->SetTitle("#Delta y (SBY1 - SBY3) [mm]");	
 
 	h_align_SBY3_SBX0_ontrack_onxaxis = new TH2F("h_align_SBY3_SBX0_ontrack_onxaxis", "", 600, 1350, 1950, 1000, -100, 100);
 	h_align_SBY3_SBX0_ontrack_onxaxis->GetXaxis()->SetTitle("SBX0 [mm]");
