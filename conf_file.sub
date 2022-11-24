@@ -1,0 +1,35 @@
+executable = submit.sh
+
+output = output/$(ClusterId).$(ProcId).out
+error = error/$(ClusterId).$(ProcId).err
+log = log/$(ClusterId).$(ProcId).log
+
+runNumber="1666901224"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
+
+runNumber="1666912340"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
+
+runNumber="1666798132"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
+
+runNumber="1666799554"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
+
+runNumber="1666802157"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
+
+runNumber="1666803737"
+arguments = $(runNumber)
++JobFlavour = "tomorrow"
+queue 1
