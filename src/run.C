@@ -144,7 +144,6 @@ int run(std::string run_number, std::string sector="C14")
 		std::vector<unsigned int> *tdo = treeReader->tdo;
 
 		counter0++; // total events
-
 		int nlay_clus = 0;
 		Layer* layer[8];
 		Layer* l_small[4];
@@ -152,12 +151,11 @@ int run(std::string run_number, std::string sector="C14")
 		trigger->isTrigger();
 
 		for(int iLayer = 0; iLayer<sizeof(layer)/sizeof(layer[0]); iLayer++){
-			if(iLayer<4)
+			if(iLayer<4) {
 				layer[iLayer] = new Layer(iLayer, false, true);
-			else layer[iLayer] = new Layer(iLayer, true, false);
-			
-			if(iLayer<4)
 				l_small[iLayer] = new Layer(iLayer, false, false);
+			}
+			else layer[iLayer] = new Layer(iLayer, true, false);
 		}
 //LM2
 		layer[0]->setAlphaBeta(0, 1);
@@ -179,8 +177,6 @@ int run(std::string run_number, std::string sector="C14")
 			std::cout<<12.5*i<<"% of the events processed"<<std::endl;
 			i++;
 		}
-
-		//std::cout<<iEvent<<std::endl;
 
 		for(int iHit = 0; iHit<nhits->size(); iHit++)
 		{
@@ -212,13 +208,11 @@ int run(std::string run_number, std::string sector="C14")
 		Cluster* cl_lay[sizeof(layer)/sizeof(layer[0])]; 
 		Cluster* cl_lay_small[sizeof(l_small)/sizeof(l_small[0])];
 
-
 		int total_hits_SM1 = 0; // how many layers have a hit
 		int total_hits_TZ = 0;
-		
 		for(int iLayer = 0; iLayer<sizeof(layer)/sizeof(layer[0]); iLayer++) {
+
 			histos->h_raw_hits[iLayer]->Fill(layer[iLayer]->getNHits()); // all hits before any rejection
-			
 			if(iLayer<4) histos->h_raw_hits_small[iLayer]->Fill(l_small[iLayer]->getNHits());
 
 			layer[iLayer]->bookFiredStrips(strips,pdo); // here we reject strips with pdo<64 and we also mask the noisy strips
@@ -261,7 +255,7 @@ int run(std::string run_number, std::string sector="C14")
 			histos->h_nclusters[iLayer]->Fill(cl_lay[iLayer]->getNClusters2());
 			if(iLayer<4) histos->h_nclusters_small[iLayer]->Fill(cl_lay_small[iLayer]->getNClusters2());
 			
-			int tot_strips[sizeof(layer)/sizeof(layer[0])] = {0, 0, 0, 0};
+			int tot_strips[sizeof(layer)/sizeof(layer[0])] = {0, 0, 0, 0, 0, 0, 0, 0};
 			int tot_strips_small[sizeof(l_small)/sizeof(l_small[0])] = {0, 0, 0, 0};
 			
 			std::vector<float> v_lead_cl_charge;
@@ -416,7 +410,7 @@ if(iLayer<4) {
 		
 		l_small[2]->setAlphaBeta(33.000-0.05, (1-0.0448)); 
 		l_small[3]->setAlphaBeta(35.778-0.1225, (1-0.0467)); 
-*/
+
 		float pos_sby1 = cl_lay_small[1]->getPosition(0); // SBY1 reference chamber position
 
 		if(cl_lay_small[2]->getNClusters2()==1 && cl_lay_small[3]->getNClusters2()==1)
@@ -475,7 +469,7 @@ if(iLayer<4) {
 			histos->h_diffpos_lay3->Fill( pos_l3, pos_l0-pos_l3); 
 			histos->h_diffpos_stereolay1->Fill(pos_sby1-pos_l3, pos_sby1);
 			histos->h_diffpos_stereolay0->Fill(pos_sby1-pos_l2, pos_sby1);
-		}
+		} */
 /*
 		histos->h_clus_positions_small_corr[1]->Fill(cl_lay_small[1]->getCorrPosition(0));
 		// SBY2
@@ -1667,10 +1661,10 @@ if(iLayer<4) {
 
 			delete track;
 		}
-*/
+
 // ========================= End tracking ==============================================
 
-		for(int iLayer=0; iLayer<8; iLayer++) 
+*/		for(int iLayer=0; iLayer<8; iLayer++) 
 		{
 			delete layer[iLayer];
 			delete cl_lay[iLayer];
